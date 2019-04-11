@@ -7,19 +7,28 @@
 
 #include <iostream>
 #include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h>
 
 using Address = sockaddr_in;
 
 class ISocket
 {
 public:
-  virtual void bind(Address) = 0;
-  virtual void listen(int) = 0;
-  virtual void accept() = 0;
+  virtual void bind() = 0;
+  virtual void listen(int backlogLenght) = 0;
+  virtual ISocket* accept() = 0;
 
   virtual void connect() = 0;
-  virtual void send(char*, std::size_t) = 0;
-  virtual std::size_t receive(char*, std::size_t) = 0;
+  virtual void send(char* buffer) = 0;
+  virtual std::size_t receive(char* buffer, std::size_t) = 0;
+  virtual void close() = 0;
+
+protected:
+  int socketDescriptor;
+  Address address;
 };
 
 
