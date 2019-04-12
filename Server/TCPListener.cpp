@@ -4,17 +4,27 @@
 
 #include "TCPListener.h"
 
-TCPListener::TCPListener(Address address): Socket(address)
+TCPListener::TCPListener(Address address, int backlogLength): Socket(address)
 {
     this->listening = false;
+    this->backlogLength = backlogLength;
 }
 
 void TCPListener::start()
 {
     if(!listening)
     {
-        listening = true;
+        if(::bind(socketDescriptor, (sockaddr*)&address, sizeof(address)) < 0)
+        {
+            //TODO throw exception
+        }
 
+        if(::listen(socketDescriptor, backlogLength) < 0)
+        {
+            //TODO throw exception
+        }
+
+        listening = true;
     }
     else
     {

@@ -12,7 +12,7 @@
 class TCPListener : public Socket
 {
 public:
-  explicit TCPListener(Address address);
+  TCPListener(Address address, int backlogLength);
 
   TCPSocket* accept();
   void start();
@@ -22,6 +22,7 @@ private:
   void listen(int backlogLength);
 
   bool listening;
+  int backlogLength;
 };
 
 
