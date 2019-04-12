@@ -11,13 +11,16 @@
 class ServerSocket : Socket
 {
 public:
-  ServerSocket();
-  ServerSocket(int socketDescriptor, Address address);
+  explicit ServerSocket(Address address);
 
-  ssize_t readn(std::size_t n, char* buffer) override ;
-  void send(char* buffer) override ;
-  std::size_t receive(char* buffer, std::size_t) override ;
-  void close() override ;
+  Socket* accept();
+  void start();
+
+private:
+  void bind();
+  void listen(int backlogLength);
+
+  bool listening;
 };
 
 

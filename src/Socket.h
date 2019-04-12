@@ -18,10 +18,12 @@ using Address = sockaddr_in;
 class Socket 
 {
 public:
-  virtual ssize_t readn(std::size_t n, char* buffer) = 0;
-  virtual void send(char* buffer) = 0;
-  virtual std::size_t receive(char* buffer, std::size_t) = 0;
-  virtual void close() = 0;
+  Socket(Address address);
+  Socket(int newSocketDescriptor, Address address);
+
+  virtual ssize_t readn(std::size_t n, char* buffer);
+  virtual ssize_t writen(std::size_t n, const char* buffer);
+  virtual void close();
 
 protected:
   int socketDescriptor;

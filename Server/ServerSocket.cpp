@@ -4,73 +4,37 @@
 
 #include "ServerSocket.h"
 
-ServerSocket::ServerSocket()
+ServerSocket::ServerSocket(Address address): Socket(address)
 {
-    socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-    if(socketDescriptor == 0)
-    {
-        //TODO throw exception
-    }
+    this->listening = false;
 }
 
-ServerSocket::ServerSocket(int socketDescriptor, Address address)
+Socket *ServerSocket::accept()
 {
-    this->socketDescriptor = socketDescriptor;
-    this->address = address;
-}
+    socklen_t addrlen;
+    int newSocketDescriptor = ::accept(socketDescriptor, (sockaddr*)&address, &addrlen);
 
-ssize_t ServerSocket::readn(std::size_t n, char* buffer)
-{
-    std::size_t nleft;
-    ssize_t nread;
-    //char* resultBuffer;
-
-    nleft = n;
-
-    while(nleft > 0)
-    {
-        if((nread = ::read(socketDescriptor, buffer, nleft)) < 0)
-        {
-            if(errno == EINTR)
-                nread = 0;
-            else
-                return -1;
-        }
-        else if(nread == 0)
-            break;
-
-        nleft -= nread;
-        buffer += nread;
-    }
-
-    return n-nleft;
-}
-
-void ServerSocket::send(char *buffer)
-{
-    if(::send(socketDescriptor, buffer, strlen(buffer), 0) < 0)
-    {
-        //TODO throw exception
-    }
-}
-
-std::size_t ServerSocket::receive(char *buffer, std::size_t)
-{
-    ssize_t bufferSize = recv(socketDescriptor, buffer, strlen(buffer), 0);
-
-    if(bufferSize < 0)
+    if(newSocketDescriptor < 0)
     {
         //TODO throw exception
     }
     else
     {
-        return static_cast<std::size_t >(bufferSize);
+        return new Socket(newSocketDescriptor, address);
     }
 }
 
-void ServerSocket::close()
+void ServerSocket::bind()
 {
-    if(::close(socketDescriptor) < 0)
+    if(::bind(socketDescriptor, (sockaddr*)&address, sizeof(address)) < 0)
+    {
+        //TODO throw exception
+    }
+}
+
+void ServerSocket::listen(int backlogLength)
+{
+    if(::listen(socketDescriptor, backlogLength) < 0)
     {
         //TODO throw exception
     }
