@@ -21,8 +21,7 @@ public:
   Socket(Address address);
   Socket(int newSocketDescriptor, Address address);
 
-  virtual ssize_t readn(std::size_t n, char* buffer);
-  virtual ssize_t writen(std::size_t n, const char* buffer);
+
   virtual void close();
 
 protected:

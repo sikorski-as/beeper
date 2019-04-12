@@ -6,14 +6,15 @@
 #define BEEPER_SERVERSOCKET_H
 
 #include "../src/Socket.h"
+#include "../Client/TCPSocket.h"
 #include <cstddef>
 
-class ServerSocket : Socket
+class TCPListener : public Socket
 {
 public:
-  explicit ServerSocket(Address address);
+  explicit TCPListener(Address address);
 
-  Socket* accept();
+  TCPSocket* accept();
   void start();
 
 private:
