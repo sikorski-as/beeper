@@ -1,13 +1,13 @@
-#ifndef BEEPER_COMMUNICATIONLAYER_H
-#define BEEPER_COMMUNICATIONLAYER_H
+#ifndef BEEPER_OUTCOMMUNICATIONLAYER_H
+#define BEEPER_OUTCOMMUNICATIONLAYER_H
 
 #include "Buffer.h"
 
 class InCommunicationLayer
 {
 public:
-  virtual void send(Buffer buffer) = 0;
+  virtual Buffer recieve() = 0;
 };
 
 
-#endif //BEEPER_COMMUNICATIONLAYER_H
+#endif //BEEPER_OUTCOMMUNICATIONLAYER_H

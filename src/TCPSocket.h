@@ -6,15 +6,23 @@
 #include "Socket.h"
 #include "TCPListener.h"
 #include "Address.h"
+#include "OutCommunicationLayer.h"
+#include "InCommunicationLayer.h"
 
 class TCPListener;
-class TCPSocket : public Socket
+class TCPSocket : public Socket, public OutCommunicationLayer, public InCommunicationLayer
 {
     friend class TCPListener; // so TCPListener can create TCPSockets for clients providing descriptor
 protected:
     bool hasRemote;
     TCPSocket(int socketDescriptor);
     TCPSocket();
+
+public:
+  void send(Buffer buffer) override;
+
+  Buffer recieve() override;
+
 public:
     Address getRemoteAddress();
     //virtual ssize_t readn(std::size_t n, char* buffer);

@@ -1,12 +1,10 @@
-//
-// Created by hubertborkowski on 17.04.19.
-//
-
 #ifndef BEEPER_SERIALIZATIONLAYER_H
 #define BEEPER_SERIALIZATIONLAYER_H
 
 #include "Serializer.h"
 #include "Deserializer.h"
+#include "OutCommunicationLayer.h"
+#include "InCommunicationLayer.h"
 
 class SerializationLayer : public Serializer, public Deserializer
 {
@@ -15,6 +13,10 @@ public:
   Event deserialize(Buffer data) override;
 
   Buffer serialize(Event event) override;
+
+protected:
+  OutCommunicationLayer* outCommunicationLayer;
+  InCommunicationLayer* inCommunicationLayer;
 };
 
 

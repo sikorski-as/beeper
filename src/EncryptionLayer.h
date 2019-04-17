@@ -7,14 +7,24 @@
 
 #include "Encryptor.h"
 #include "Decryptor.h"
+#include "OutCommunicationLayer.h"
+#include "InCommunicationLayer.h"
 
-class EncryptionLayer : public Encryptor, public Decryptor
+class EncryptionLayer : public Encryptor, public Decryptor, public OutCommunicationLayer, public InCommunicationLayer
 {
   //TODO this is a work-in-progress version and doesn't actually encrypt anything
 public:
   Buffer decrypt(Buffer data) override;
 
   Buffer encrypt(Buffer data) override;
+
+  void send(Buffer buffer) override;
+
+  Buffer recieve() override;
+
+protected:
+  OutCommunicationLayer* outCommunicationLayer;
+  InCommunicationLayer* inCommunicationLayer;
 };
 
 

@@ -90,3 +90,13 @@ void TCPSocket::receiven(char *buffer, int size) {
         buffer += recvd;
     }while(left != 0);
 }
+
+void TCPSocket::send(Buffer buffer)
+{
+    //TODO
+}
+
+Buffer TCPSocket::recieve()
+{
+    //TODO
+}
