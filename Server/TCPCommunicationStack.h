@@ -1,6 +1,3 @@
-//
-// Created by hubertborkowski on 17.04.19.
-//
 
 #ifndef BEEPER_TCPCOMMUNICATIONSTACK_H
 #define BEEPER_TCPCOMMUNICATIONSTACK_H

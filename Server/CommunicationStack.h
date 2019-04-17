@@ -7,6 +7,10 @@
 
 #include "Event.h"
 #include "Client.h"
+#include "../src/Encryptor.h"
+#include "../src/Decryptor.h"
+#include "../src/Deserializer.h"
+#include "../src/Serializer.h"
 
 class Client;
 
