@@ -16,12 +16,12 @@ class Socket
 public:
     friend class Selector;
     Address getLocalAddress();
-
+    bool operator==(const Socket&);
+    void close();
 protected:
     int socketDescriptor;
     Socket();
     Socket(int newSocketDescriptor);
-    virtual void close();
 };
 
 #endif //BEEPER_SOCKET_H

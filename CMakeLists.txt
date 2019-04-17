@@ -12,7 +12,13 @@ add_executable(beeper_server
 
         src/TCPListener.cpp src/TCPListener.h
         src/TCPSocket.cpp src/TCPSocket.h
-        )
+        src/Buffer.cpp src/Buffer.h
+        Server/ClientHandler.cpp Server/ClientHandler.h )
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(beeper_server Threads::Threads)
+
 add_executable(beeper_client
         Client/client.cpp
 
@@ -21,4 +27,4 @@ add_executable(beeper_client
 
         src/TCPSocket.cpp src/TCPSocket.h
         src/TCPClientSocket.cpp src/TCPClientSocket.h
-        )
+        src/Buffer.cpp src/Buffer.h)

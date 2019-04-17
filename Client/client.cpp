@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
+#include <exception>
 #include "../src/Address.h"
 #include "../src/TCPClientSocket.h"
+#include "../src/Buffer.h"
 
 int main()
 {
@@ -17,22 +19,40 @@ int main()
         Address remote = socket.getRemoteAddress();
         std::cout << "server address: " << GetAddressAndPortAsString(remote) << std::endl;
 
+        bool echoMode = false;
+
         while(true){
             std::string message;
-            std::cout << "Message to send: ";
-            std::cin >> message;
-            auto x = socket.send(message.size(), message.c_str());
-            std::cout << "writen: " << x << std::endl;
 
-            char msg_buffer[256];
-            socket.receive(256, msg_buffer);
-            std::string msg(msg_buffer);
-            std::cout << "server: " << msg << std::endl;
+            std::cout << "message to send: ";
+            std::getline(std::cin, message);
+
+            try{
+                if(message.length() == 0){
+                    std::cout << "message cannot be empty!" << std::endl;
+                    continue;
+                }
+                socket.send(message.c_str(), message.length());
+
+                char buffer[256];
+                int received = socket.receive(buffer, 256);
+                if(received > 0){
+                    std::cout << "got response: " << std::string(buffer, received) << std::endl;
+                }
+            }
+            catch (TCPSocket::ConnectionClosed & e){
+                std::cout << std::endl << e.what() << std::endl;
+                std::cout << "closing app...\n";
+                return 0;
+            }
         }
 
     }
+    catch(std::exception e){
+        std::cout << std::string(e.what()) << std::endl;
+    }
     catch(char const* e){
-        std::cout << std::string(e);
+        std::cout << std::string(e) << std::endl;
     }
 
 }

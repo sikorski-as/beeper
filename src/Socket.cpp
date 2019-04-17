@@ -1,5 +1,9 @@
 #include "Socket.h"
 
+bool Socket::operator==(const Socket& another){
+    return socketDescriptor == another.socketDescriptor;
+}
+
 Address Socket::getLocalAddress(){
     Address address;
     socklen_t localAddressLength = sizeof(address);

@@ -1,43 +1,52 @@
 #include "TCPListener.h"
 #include <iostream>
 
-TCPListener::TCPListener(Address address): Socket()
+TCPListener::TCPListener(): Socket()
 {
     this->listening = false;
     this->backlogLength = -1;
-
-    if(::bind(socketDescriptor, (sockaddr*)&address, sizeof(address)) < 0)
-    {
-        throw "TCPListener error: could not bind!";
-    }
 }
 
-void TCPListener::start(int backlogLength)
+void TCPListener::start(Address address, int backlogLength)
 {
     if(backlogLength < 1){
-        throw "TCPListener error: queue cannot be shorter than 1!";
+        throw TCPListenerError("TCPListener's queue cannot be shorter than 1");
     }
     this->backlogLength = backlogLength;
 
     if(!listening)
     {
+        if(::bind(socketDescriptor, (sockaddr*)&address, sizeof(address)) < 0)
+        {
+            int x = errno;
+            throw TCPListenerError("Could not bind", x);
+        }
+
+        int enable = 1;
+        int status = setsockopt(socketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+        if (status < 0){
+            int x = errno;
+            throw TCPListenerError("Could not setup address reusing for TCPListener", x);
+        }
+
         if(::listen(socketDescriptor, backlogLength) < 0)
         {
-            throw "TCPListener error: could not listen!";
+            int x = errno;
+            throw TCPListenerError("Could not start listening", x);
         }
 
         listening = true;
     }
     else
     {
-        throw "TCPListener error: already listening!";
+        throw TCPListenerError("TCPListener is already listening");
     }
 }
 
 TCPSocket TCPListener::accept()
 {
     if(!listening){
-        throw "TCPListener error: accept(): not listening!";
+        throw TCPListenerError("Could not accept while TCPListener is not listening");
     }
 
     socklen_t remoteAddressLength;
@@ -47,12 +56,10 @@ TCPSocket TCPListener::accept()
     if(newSocketDescriptor < 0)
     {
         int x = errno;
-        std::cout << "errno: " << x << std::endl;
-        throw "TCPListener error: could not accept connection!";
+        throw TCPListenerError("Could not accept connection", x);
     }
     else
     {
         return TCPSocket(newSocketDescriptor);
     }
-
 }

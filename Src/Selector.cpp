@@ -1,4 +1,5 @@
 #include <sys/select.h>
+#include <sys/time.h>
 #include <iostream>
 #include "Selector.h"
 #include "Socket.h"
@@ -18,10 +19,19 @@ bool Selector::isPresent(const Socket& socket){
     return find(socket) != -1;
 }
 
-Selector::Selector() {
+Selector::Selector(bool readSelector, bool writeSelector, bool signalSelector) {
+    this->readSelector = readSelector;
+    this->writeSelector = writeSelector;
+    this->signalSelector = signalSelector;
     FD_ZERO(&read);
     FD_ZERO(&write);
     FD_ZERO(&signal);
+}
+
+void Selector::setupSelector(bool readSelector, bool writeSelector, bool signalSelector){
+    this->readSelector = readSelector;
+    this->writeSelector = writeSelector;
+    this->signalSelector = signalSelector;
 }
 
 void Selector::add(const Socket& socket){
@@ -42,7 +52,7 @@ void Selector::clear(){
     socketDescriptors.clear();
 }
 
-int Selector::wait(){
+int Selector::wait(int timeoutInSeconds){
     FD_ZERO(&read);
     FD_ZERO(&write);
     FD_ZERO(&signal);
@@ -51,11 +61,24 @@ int Selector::wait(){
         if(fd > max){
             max = fd;
         }
-        FD_SET(fd, &read);
-        FD_SET(fd, &write);
-        FD_SET(fd, &signal);
+        if(readSelector)
+            FD_SET(fd, &read);
+        if(writeSelector)
+            FD_SET(fd, &write);
+        if(signalSelector)
+            FD_SET(fd, &signal);
     }
-    int howManyActive = select(max + 1, &read, &write, &signal, 0); // 0 = no timeout
+
+    timeval* timeout = nullptr;
+    if(timeoutInSeconds > 0){
+        timeout = new timeval;
+        timeout->tv_sec = timeoutInSeconds;
+        timeout->tv_usec = 0;
+    }
+    int howManyActive = select(max + 1, &read, &write, &signal, timeout); // 0 = no timeout
+    if(timeout != nullptr)
+        delete timeout;
+
     if(howManyActive == -1){
         throw "Selector::wait() error";
     }

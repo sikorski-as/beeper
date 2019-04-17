@@ -10,6 +10,12 @@ TCPSocket::TCPSocket(int socketDescriptor)
 {
     this->socketDescriptor = socketDescriptor;
     this->hasRemote = true;
+
+    int enable = 1;
+    int status = setsockopt(socketDescriptor, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+    if (status < 0){
+        throw TCPSocketError("Could not setup address reusing", errno);
+    }
 }
 
 Address TCPSocket::getRemoteAddress(){
@@ -20,46 +26,67 @@ Address TCPSocket::getRemoteAddress(){
             return remoteAddress;
         }
         else{
-            throw "TCPSocket error: getRemote(): could not get the remote address";
+            int x = errno;
+            throw TCPSocketError("Could not get remote peer's address", x);
         }
     }
     else{
-        throw "TCPSocket error: getRemote(): no remote";
+        throw NoRemote();
     }
 }
 
-int TCPSocket::receive(int size, char *buffer)
+int TCPSocket::receive(char * buffer, int size)
 {
     if(!hasRemote)
     {
-        throw "TCPSocket error: no remote to read from!";
+        throw NoRemote();
     }
 
     int received = ::read(socketDescriptor, buffer, size);
     if(received < 0){
-        throw "TCPSocket: send(): error!";
+        int x = errno;
+        throw IOError(" - could not receive", x);
     }
     else if(received == 0){
-        throw "TCPSocket: connection ended!";
+        throw ConnectionClosed();
     }
 
     return received;
 }
 
-int TCPSocket::send(int size, const char *buffer)
+int TCPSocket::send(const char *buffer, int size)
 {
     if(!hasRemote)
     {
-        throw "TCPSocket error: no remote to send to!";
+        throw NoRemote();
     }
 
     int sent = ::write(socketDescriptor, buffer, size);
     if(sent < 0){
-        throw "TCPSocket: send(): error!";
+        int x = errno;
+        throw IOError(" - could not send", x);
     }
     else if(sent == 0){
-        throw "TCPSocket: connection ended!";
+        throw ConnectionClosed();
     }
 
     return sent;
+}
+
+void TCPSocket::sendn(const char *buffer, int size) {
+    int left = size;
+    do{
+        int sent = send(buffer, left);
+        left -= sent;
+        buffer += sent;
+    }while(left != 0);
+}
+
+void TCPSocket::receiven(char *buffer, int size) {
+    int left = size;
+    do{
+        int recvd = receive(buffer, left);
+        left -= recvd;
+        buffer += recvd;
+    }while(left != 0);
 }
