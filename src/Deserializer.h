@@ -1,7 +1,3 @@
-//
-// Created by hubertborkowski on 17.04.19.
-//
-
 #ifndef BEEPER_DESERIALIZER_H
 #define BEEPER_DESERIALIZER_H
 
@@ -9,7 +5,8 @@
 
 class Deserializer
 {
-
+public:
+  virtual Event deserialize(std::string data) = 0;
 };
 
 

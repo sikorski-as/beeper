@@ -6,7 +6,7 @@
 class Serializer
 {
 public:
-  virtual  encrypt(Event event) = 0;
+  virtual std::string encrypt(Event event) = 0;
 };
 
 
