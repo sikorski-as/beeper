@@ -18,9 +18,13 @@ public:
 
   ~Client();
 
+  std::queue<Event>* getQueue();
+
 private:
   std::queue<Event> eventQueue;
   CommunicationStack* commStack;
+
+
 };
 
 

@@ -7,6 +7,7 @@
 
 #include "CommunicationStack.h"
 #include "Client.h"
+#include "../src/TCPSocket.h"
 
 class TCPCommunicationStack : public CommunicationStack
 {
@@ -21,6 +22,8 @@ protected:
   void insertIntoQueue(Event event) override;
 
   Client* client;
+
+  TCPSocket socket;
 };
 
 

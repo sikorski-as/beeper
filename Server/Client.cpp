@@ -10,3 +10,8 @@ Client::~Client()
 {
     delete commStack;
 }
+
+std::queue<Event> *Client::getQueue()
+{
+    return &eventQueue;
+}
