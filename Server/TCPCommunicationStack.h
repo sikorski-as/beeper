@@ -9,18 +9,22 @@
 class TCPCommunicationStack : public CommunicationStack
 {
 public:
-  explicit TCPCommunicationStack() = default;
+  TCPCommunicationStack(Serializer*, Deserializer*, Encryptor*, Decryptor*);
 
   Event getEvent() override;
   void sendEvent(Event event) override;
-  void setClient(Client* client) { this->client = client; };
+  void setClient(Client* client) override { this->client = client; }
+  void setSocket(Socket *socket) override { this->socket = reinterpret_cast<TCPSocket*>(socket); }
 
 protected:
   void insertIntoQueue(Event event) override;
 
   Client* client;
-
-  TCPSocket socket;
+  Serializer* serializer;
+  Deserializer* deserializer;
+  Encryptor* encryptor;
+  Decryptor* decryptor;
+  TCPSocket* socket;
 };
 
 
