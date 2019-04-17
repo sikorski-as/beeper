@@ -24,11 +24,11 @@ public:
     ~ClientHandler();
 };
 
-
-class Client{
-public:
-
-};
+//
+//class Client{
+//public:
+//
+//};
 
 
 #endif //BEEPER_CLIENTHANDLER_H
