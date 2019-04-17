@@ -22,7 +22,9 @@ private:
   std::queue<Event> eventQueue;
   CommunicationStack* commStack;
 
-
+  void send(Event event);
+  void receive();
+  void handleEvent();
 };
 
 
