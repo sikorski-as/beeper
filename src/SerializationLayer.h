@@ -10,9 +10,11 @@
 
 class SerializationLayer : public Serializer, public Deserializer
 {
+  //TODO this is a work-in-progress version and does only a bare-bones serialization
 public:
-  Event deserialize(std::string data) override;
-  std::string encrypt(Event event) override;
+  Event deserialize(Buffer data) override;
+
+  Buffer serialize(Event event) override;
 };
 
 

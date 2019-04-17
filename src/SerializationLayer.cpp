@@ -4,12 +4,16 @@
 
 #include "SerializationLayer.h"
 
-Event SerializationLayer::deserialize(std::string data)
+Event SerializationLayer::deserialize(Buffer data)
 {
-    return nullptr;
+    return Event(data.getData());
 }
 
-std::string SerializationLayer::encrypt(Event event)
+Buffer SerializationLayer::serialize(Event event)
 {
-    return nullptr;
+    Buffer buffer;
+    buffer.append(event.getType());
+
+    return buffer;
 }
+

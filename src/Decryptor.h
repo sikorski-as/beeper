@@ -1,12 +1,12 @@
 #ifndef BEEPER_DECRYPTOR_H
 #define BEEPER_DECRYPTOR_H
 
-#include <string>
+#include "Buffer.h"
 
 class Decryptor
 {
 public:
-  virtual std::string decrypt(std::string data) = 0;
+  virtual Buffer decrypt(Buffer data) = 0;
 };
 
 

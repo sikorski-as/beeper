@@ -10,10 +10,11 @@
 
 class EncryptionLayer : public Encryptor, public Decryptor
 {
+  //TODO this is a work-in-progress version and doesn't actually encrypt anything
 public:
-  std::string decrypt(std::string data) override;
+  Buffer decrypt(Buffer data) override;
 
-  std::string encrypt(std::string data) override;
+  Buffer encrypt(Buffer data) override;
 };
 
 

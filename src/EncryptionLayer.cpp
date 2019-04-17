@@ -4,12 +4,12 @@
 
 #include "EncryptionLayer.h"
 
-std::string EncryptionLayer::decrypt(std::string data)
+Buffer EncryptionLayer::decrypt(Buffer data)
 {
-    return nullptr;
+    return data;
 }
 
-std::string EncryptionLayer::encrypt(std::string data)
+Buffer EncryptionLayer::encrypt(Buffer data)
 {
-    return nullptr;
+    return data;
 }

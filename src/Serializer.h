@@ -2,11 +2,12 @@
 #define BEEPER_SERIALIZER_H
 
 #include "../Server/Event.h"
+#include "Buffer.h"
 
 class Serializer
 {
 public:
-  virtual std::string encrypt(Event event) = 0;
+  virtual Buffer serialize(Event event) = 0;
 };
 
 

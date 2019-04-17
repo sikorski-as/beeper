@@ -12,6 +12,7 @@ class Event
 public:
   explicit Event(std::string type);
 
+  std::string getType() { return type; };
 private:
   std::string type;
 };

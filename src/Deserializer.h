@@ -2,11 +2,12 @@
 #define BEEPER_DESERIALIZER_H
 
 #include "../Server/Event.h"
+#include "Buffer.h"
 
 class Deserializer
 {
 public:
-  virtual Event deserialize(std::string data) = 0;
+  virtual Event deserialize(Buffer data) = 0;
 };
 
 
