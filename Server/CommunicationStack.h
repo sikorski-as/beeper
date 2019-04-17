@@ -18,7 +18,7 @@ class Client;
 class CommunicationStack
 {
 public:
-  virtual Event getEvent() = 0;
+  virtual void receiveEvent() = 0;
   virtual void sendEvent(Event event) = 0;
   
   virtual void setClient(Client* client) = 0;

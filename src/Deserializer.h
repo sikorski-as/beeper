@@ -7,6 +7,8 @@
 class Deserializer
 {
 public:
+  virtual Event recieve() = 0;
+protected:
   virtual Event deserialize(Buffer data) = 0;
 };
 

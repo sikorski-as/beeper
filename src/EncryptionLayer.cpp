@@ -4,6 +4,12 @@
 
 #include "EncryptionLayer.h"
 
+EncryptionLayer::EncryptionLayer(OutCommunicationLayer *out, InCommunicationLayer *in)
+{
+    outCommunicationLayer = out;
+    inCommunicationLayer = in;
+}
+
 Buffer EncryptionLayer::decrypt(Buffer data)
 {
     return data;
@@ -19,7 +25,7 @@ void EncryptionLayer::send(Buffer buffer)
     outCommunicationLayer->send(encrypt(buffer));
 }
 
-Buffer EncryptionLayer::recieve()
+Buffer EncryptionLayer::receive()
 {
-    return decrypt(inCommunicationLayer->recieve());
+    return decrypt(inCommunicationLayer->receive());
 }

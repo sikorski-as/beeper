@@ -96,7 +96,7 @@ void TCPSocket::send(Buffer buffer)
     //TODO
 }
 
-Buffer TCPSocket::recieve()
+Buffer TCPSocket::receive()
 {
     //TODO
 }

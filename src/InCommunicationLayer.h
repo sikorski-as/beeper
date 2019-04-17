@@ -6,7 +6,7 @@
 class InCommunicationLayer
 {
 public:
-  virtual Buffer recieve() = 0;
+  virtual Buffer receive() = 0;
 };
 
 

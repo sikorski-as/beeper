@@ -1,14 +1,11 @@
-
 #include "TCPCommunicationStack.h"
 
-TCPCommunicationStack::TCPCommunicationStack(Serializer *serializer,
-                                             Deserializer *deserializer,
-                                             Encryptor *encryptor, Decryptor *decryptor)
+TCPCommunicationStack::TCPCommunicationStack(TCPSocket* socket, Serializer *serializer,
+                                             Deserializer *deserializer)
 {
+    this->socket = socket;
     this->serializer = serializer;
     this->deserializer = deserializer;
-    this->encryptor = encryptor;
-    this->decryptor = decryptor;
 }
 
 void TCPCommunicationStack::insertIntoQueue(Event event)
@@ -16,12 +13,12 @@ void TCPCommunicationStack::insertIntoQueue(Event event)
     client->insertIntoQueue(event);
 }
 
-Event TCPCommunicationStack::getEvent()
+void TCPCommunicationStack::receiveEvent()
 {
-
+    insertIntoQueue(deserializer->recieve());
 }
 
 void TCPCommunicationStack::sendEvent(Event event)
 {
-
+    serializer->send(event);
 }

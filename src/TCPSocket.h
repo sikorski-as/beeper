@@ -21,7 +21,7 @@ protected:
 public:
   void send(Buffer buffer) override;
 
-  Buffer recieve() override;
+  Buffer receive() override;
 
 public:
     Address getRemoteAddress();

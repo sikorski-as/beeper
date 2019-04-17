@@ -14,13 +14,15 @@ class EncryptionLayer : public Encryptor, public Decryptor, public OutCommunicat
 {
   //TODO this is a work-in-progress version and doesn't actually encrypt anything
 public:
+  EncryptionLayer(OutCommunicationLayer* out, InCommunicationLayer* in);
+
   Buffer decrypt(Buffer data) override;
 
   Buffer encrypt(Buffer data) override;
 
   void send(Buffer buffer) override;
 
-  Buffer recieve() override;
+  Buffer receive() override;
 
 protected:
   OutCommunicationLayer* outCommunicationLayer;

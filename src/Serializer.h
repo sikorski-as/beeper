@@ -7,6 +7,8 @@
 class Serializer
 {
 public:
+  virtual void send(Event event) = 0;
+protected:
   virtual Buffer serialize(Event event) = 0;
 };
 
