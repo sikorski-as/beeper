@@ -3,7 +3,7 @@
 
 void TCPCommunicationStack::insertIntoQueue(Event event)
 {
-    client->getQueue()->push(event);
+    client->insertIntoQueue(event);
 }
 
 Event TCPCommunicationStack::getEvent()

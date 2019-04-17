@@ -16,7 +16,7 @@ public:
 
   ~Client();
 
-  std::queue<Event>* getQueue();
+  void insertIntoQueue(Event event);
 
 private:
   std::queue<Event> eventQueue;

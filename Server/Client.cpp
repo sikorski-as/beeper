@@ -11,7 +11,7 @@ Client::~Client()
     delete commStack;
 }
 
-std::queue<Event> *Client::getQueue()
+void Client::insertIntoQueue(Event event)
 {
-    return &eventQueue;
+    eventQueue.push(event);
 }
