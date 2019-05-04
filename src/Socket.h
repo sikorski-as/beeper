@@ -6,17 +6,18 @@
 #include <unistd.h>
 #include <exception>
 #include <string>
+
 #include "Address.h"
-#include "Selector.h"
+//#include "Selector.h"
 
 class Selector;
-
 class Socket 
 {
 public:
     friend class Selector;
     Address getLocalAddress();
     bool operator==(const Socket&);
+    int getDescriptor() const;
     void close();
 protected:
     int socketDescriptor;

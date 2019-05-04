@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <string>
+
 #include "Socket.h"
 #include "TCPListener.h"
 #include "Address.h"
@@ -14,8 +15,8 @@ class TCPSocket : public Socket
 protected:
     bool hasRemote;
     TCPSocket(int socketDescriptor);
-    TCPSocket();
 public:
+    TCPSocket(); // todo: this should be protected
     Address getRemoteAddress();
     //virtual ssize_t readn(std::size_t n, char* buffer);
     //virtual ssize_t writen(std::size_t n, const char* buffer);

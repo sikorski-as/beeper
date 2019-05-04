@@ -36,3 +36,7 @@ void Socket::close()
         throw "Socket error: could not close socket!";
     }
 }
+
+int Socket::getDescriptor() const {
+    return socketDescriptor;
+}

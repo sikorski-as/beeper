@@ -3,24 +3,27 @@ project(beeper)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(beeper_server
-        Server/server.cpp
+add_executable( beeper_server
+        Server/main.cpp
 
         src/Socket.cpp src/Socket.h
         src/Address.cpp src/Address.h
         src/Selector.cpp src/Selector.h
-
         src/TCPListener.cpp src/TCPListener.h
         src/TCPSocket.cpp src/TCPSocket.h
         src/Buffer.cpp src/Buffer.h
-        Server/ClientHandler.cpp Server/ClientHandler.h )
+
+        Server/Server.cpp Server/Server.h
+        Server/ClientMonitor.cpp Server/ClientMonitor.h
+        Server/Client.cpp Server/Client.h
+        Server/Event.cpp Server/Event.h)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(beeper_server Threads::Threads)
 
-add_executable(beeper_client
-        Client/client.cpp
+add_executable( beeper_client
+        Client/main.cpp
 
         src/Socket.cpp src/Socket.h
         src/Address.cpp src/Address.h
