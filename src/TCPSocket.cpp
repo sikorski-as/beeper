@@ -6,6 +6,10 @@ TCPSocket::TCPSocket()
     this->hasRemote = false;
 }
 
+bool TCPSocket::operator==(const TCPSocket& another) const{
+    return getDescriptor() == another.getDescriptor();
+}
+
 TCPSocket::TCPSocket(int socketDescriptor)
 {
     this->socketDescriptor = socketDescriptor;

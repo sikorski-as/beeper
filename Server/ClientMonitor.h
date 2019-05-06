@@ -5,7 +5,9 @@
 #include <exception>
 #include <mutex>
 #include <vector>
+#include <unordered_map>
 #include "../src/TCPSocket.h"
+#include "../src/Selector.h"
 #include "Client.h"
 #include "Event.h"
 
@@ -13,38 +15,38 @@
 class ClientMonitor {
     std::mutex clientListAccess;
     std::vector<Client*> clients;
+    std::unordered_map<TCPSocket, Client*> socketToClientMap;
+    Selector& selector;
 
     // callers of these need to lock clientListAccess first
-    int findClientBy(TCPSocket & socket);
+    int findClientBy(const TCPSocket & socket);
     int findClientBy(const std::string& username);
+    int findClientBy(Client*);
+
     bool clientExists(TCPSocket & socket);
     bool clientExists(const std::string& username);
 public:
+    void status();
     // new client arrived
-    void insertClient(Client*);
-    void insertClient(TCPSocket& socket);
+    ClientMonitor(Selector&);
+
+    void insertClient(const TCPSocket&, Client*);
 
     // connection with client is closed / should be closed
-    // todo: void removeClient(Client*);
-    void removeClient(TCPSocket& socket);
-    void removeClient(const std::string& username);
+    void removeClient(Client*);
+    void removeClient(const TCPSocket&);
     void removeAllClients();
-
-    // insert event to handle (login, message from another client)
-    void insertIntoUsersIncomingQueue(TCPSocket&, Event e);
-    void insertIntoUsersIncomingQueue(const std::string& username, Event e);
 
     // notify ClientThreadTask (sending possible, receiving possible, new event in queue)
     void notifyRead(TCPSocket&);
     void notifyWrite(TCPSocket&);
 
-    // void notify(const std::string& username);
+    // todo: functions like void sendMessage(username of the recipient, message);
 
     class ClientNotFound : public std::exception{
     public:
         virtual const char* what(){return "Specified Client not found in ClientMonitor";}
     };
 };
-
 
 #endif //BEEPER_CLIENTMONITOR_H

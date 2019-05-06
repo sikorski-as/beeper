@@ -8,11 +8,12 @@
 
 
 class Server {
+    friend class ClientMonitor;
     std::atomic<bool> running;
     TCPListener listener;
-    Selector selector;
     void communicationThreadTask();
 public:
+    Selector selector;
     ClientMonitor clientMonitor;
 
     Server();

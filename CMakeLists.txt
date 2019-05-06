@@ -16,7 +16,15 @@ add_executable( beeper_server
         Server/Server.cpp Server/Server.h
         Server/ClientMonitor.cpp Server/ClientMonitor.h
         Server/Client.cpp Server/Client.h
-        Server/Event.cpp Server/Event.h)
+        Server/Event.cpp Server/Event.h
+        src/IONotifiable.h
+        src/CommunicationStack.h
+        src/TCPCommunicationStack.cpp src/TCPCommunicationStack.h
+        src/SerializationLayer.cpp src/SerializationLayer.h
+        src/PacketHandler.h
+        src/monitor.h
+        src/SynchronizedQueue.h
+        src/TCPLayer.cpp src/TCPLayer.h)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -30,4 +38,17 @@ add_executable( beeper_client
 
         src/TCPSocket.cpp src/TCPSocket.h
         src/TCPClientSocket.cpp src/TCPClientSocket.h
-        src/Buffer.cpp src/Buffer.h)
+        src/Buffer.cpp src/Buffer.h
+
+        src/IONotifiable.h
+        src/CommunicationStack.h
+        src/TCPCommunicationStack.cpp src/TCPCommunicationStack.h
+        src/SerializationLayer.cpp src/SerializationLayer.h
+        src/PacketHandler.h
+        src/monitor.h
+        src/SynchronizedQueue.h
+        src/TCPLayer.cpp src/TCPLayer.h)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(beeper_client Threads::Threads)

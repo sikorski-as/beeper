@@ -23,6 +23,18 @@ protected:
     int socketDescriptor;
     Socket();
     Socket(int newSocketDescriptor);
+
+    class SocketError : public std::exception{
+    protected:
+        std::string reason;
+        int code;
+    public:
+        SocketError(std::string reason, int errorCode = 0)
+        : reason(reason + " (" + std::to_string(code) + ")"), code(errorCode){
+
+        }
+        virtual const char* what() { return reason.c_str();}
+    };
 };
 
 #endif //BEEPER_SOCKET_H

@@ -1,12 +1,20 @@
 #include <mutex>
+#include <iostream>
 #include "ClientMonitor.h"
 #include "../src/TCPSocket.h"
 
+ClientMonitor::ClientMonitor(Selector & selector) : selector(selector){
+
+}
+
+
 // callers of this need to lock clientListAccess first
-int ClientMonitor::findClientBy(TCPSocket &socket) {
+int ClientMonitor::findClientBy(const TCPSocket &socket) {
+    auto socketId = socket.getDescriptor();
+    auto client = socketToClientMap[socket];
     for(int i = 0; i < clients.size(); i++){
-        if(clients[i]->getSocket() == socket){
-            return i;
+        if(clients[i] == client){
+            return i; // we want index instead of client pointer to easily remove clients (erase)
         }
     }
     throw ClientNotFound();
@@ -16,7 +24,16 @@ int ClientMonitor::findClientBy(TCPSocket &socket) {
 int ClientMonitor::findClientBy(const std::string& username) {
     for(int i = 0; i < clients.size(); i++){
         if(clients[i]->getUsername() == username){
-            return i;
+            return i; // we want index instead of client pointer to easily remove clients (erase)
+        }
+    }
+    throw ClientNotFound();
+}
+
+int ClientMonitor::findClientBy(Client* client) {
+    for(int i = 0; i < clients.size(); i++){
+        if(clients[i] == client){
+            return i; // we want index instead of client pointer to easily remove clients (erase)
         }
     }
     throw ClientNotFound();
@@ -44,21 +61,53 @@ bool ClientMonitor::clientExists(const std::string& username) {
     return true;
 }
 
-void ClientMonitor::insertClient(TCPSocket &socket) {
+//
+// public
+//
+
+void ClientMonitor::insertClient(const TCPSocket& socket, Client * client) {
     std::lock_guard<std::mutex> lock(clientListAccess);
-    clients.push_back(new Client(socket));
+    if(socketToClientMap.find(socket) == socketToClientMap.end()){
+        socketToClientMap[socket] = client;
+    }
+
+    clients.push_back(client);
+
+    selector.add(socket);
 }
 
-void ClientMonitor::removeClient(TCPSocket &socket) {
+void ClientMonitor::removeClient(Client* client) {
     std::lock_guard<std::mutex> lock(clientListAccess);
-    int clientIndex = findClientBy(socket);
-    clients.erase(clients.begin() + clientIndex);
+    try{
+        int clientIndex = findClientBy(client);
+        clients.erase(clients.begin() + clientIndex);
+
+        for(auto it = socketToClientMap.begin(); it != socketToClientMap.end(); ++it){
+            if(it->second == client){
+                selector.remove(it->first);
+                socketToClientMap.erase(it);
+                break;
+            }
+        }
+    }
+    catch(ClientMonitor::ClientNotFound& e){}
 }
 
-void ClientMonitor::removeClient(const std::string& username) {
+void ClientMonitor::removeClient(const TCPSocket& socket){
     std::lock_guard<std::mutex> lock(clientListAccess);
-    int clientIndex = findClientBy(username);
-    clients.erase(clients.begin() + clientIndex);
+    try{
+        int clientIndex = findClientBy(socket);
+        clients.erase(clients.begin() + clientIndex);
+
+        for(auto it = socketToClientMap.begin(); it != socketToClientMap.end(); ++it){
+            if(it->first == socket){
+                selector.remove(socket);
+                socketToClientMap.erase(it);
+                break;
+            }
+        }
+    }
+    catch(ClientMonitor::ClientNotFound& e){}
 }
 
 void ClientMonitor::removeAllClients() {
@@ -68,33 +117,26 @@ void ClientMonitor::removeAllClients() {
             delete clients[i];
         }
     }
+
+    selector.clear();
     clients.clear();
+    socketToClientMap.clear();
 }
 
-void ClientMonitor::insertIntoUsersIncomingQueue(TCPSocket& socket, Event e) {
+void ClientMonitor::notifyRead(TCPSocket & socket) {
     std::lock_guard<std::mutex> lock(clientListAccess);
-    int clientIndex = findClientBy(socket);
-    clients[clientIndex]->insertIntoQueue(e);
+    socketToClientMap[socket]->notifyRead();
 }
 
-void ClientMonitor::insertIntoUsersIncomingQueue(const std::string& username, Event e) {
+
+void ClientMonitor::notifyWrite(TCPSocket & socket) {
     std::lock_guard<std::mutex> lock(clientListAccess);
-    int clientIndex = findClientBy(username);
-    clients[clientIndex]->insertIntoQueue(e);
-    clients[clientIndex]->notify();
+    socketToClientMap[socket]->notifyWrite();
 }
 
-//void ClientMonitor::notify(const std::string& username) {
-//    std::lock_guard<std::mutex> lock(clientListAccess);
-//    int clientIndex = findClientBy(username);
-//    clients[clientIndex]->notify();
-//}
-
-void ClientMonitor::notifyRead(TCPSocket &) {
-    // todo
-}
-
-
-void ClientMonitor::notifyWrite(TCPSocket &) {
-    // todo
+void ClientMonitor::status() {
+    std::lock_guard<std::mutex> lock(clientListAccess);
+    std::cout << "client monitor status\n";
+    std::cout << "\tentries in socketToClient map: " << socketToClientMap.size() << "\n";
+    std::cout << "\tentries in clients vector: " << clients.size() << "\n";
 }

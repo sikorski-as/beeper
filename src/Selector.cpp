@@ -62,6 +62,7 @@ void Selector::add(const TCPSocket& socket){
     if(!isPresent(socket)){
         sockets.push_back(socket);
     }
+    std::cout << "sockets in selector: " << sockets.size() << std::endl;
 }
 
 void Selector::remove(const TCPSocket& socket){

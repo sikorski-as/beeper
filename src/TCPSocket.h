@@ -17,6 +17,7 @@ protected:
     TCPSocket(int socketDescriptor);
 public:
     TCPSocket(); // todo: this should be protected
+    bool operator==(const TCPSocket&) const;
     Address getRemoteAddress();
     //virtual ssize_t readn(std::size_t n, char* buffer);
     //virtual ssize_t writen(std::size_t n, const char* buffer);
@@ -49,5 +50,17 @@ public:
     };
 
 };
+
+namespace std {
+    template<> struct hash<TCPSocket>
+    {
+        typedef TCPSocket argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(argument_type const& s) const noexcept
+        {
+            return std::hash<int>{}(s.getDescriptor());
+        }
+    };
+}
 
 #endif //BEEPER_TCPSOCKET_H

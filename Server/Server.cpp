@@ -2,8 +2,9 @@
 #include <thread>
 #include "Server.h"
 #include "Server.h"
+#include "../src/TCPCommunicationStack.h"
 
-Server::Server() : listener(), selector(listener) {
+Server::Server() : listener(), selector(listener), clientMonitor(selector) {
     running = false;
 }
 
@@ -23,8 +24,10 @@ bool Server::isRunning() {
 
 void Server::stop() {
     if(running){
+        clientMonitor.removeAllClients(); // todo: nice way to inform clients about stopping server
         listener.close();
         selector.clear();
+
         running = false;
         // todo: let restart server nicely
     }
@@ -34,35 +37,53 @@ void Server::communicationThreadTask() {
     while(running){
         int activeSockets = selector.wait();
 
-        std::cout << "!\n";
-
         if(selector.isListenerReady()){
             try{
-                TCPSocket newClient = listener.accept();
+                TCPSocket newClientSocket = listener.accept();
 
-                // todo: tutaj budujemy stos protokołów
-                // todo: tworzymy usera
-                // todo: auto newClient = new Client(new CommunicationStack());
+                CommunicationStack* commStack = new TCPCommunicationStack(newClientSocket);
+                auto newClient = new Client(commStack);
 
-                auto address = newClient.getRemoteAddress();
-                std::cout << "new client arrived (" << GetAddressAndPortAsString(address) << ")\n";
+                auto address = newClientSocket.getRemoteAddress();
+                std::cout << "new client arrived from " << GetAddressAndPortAsString(address) << "\n";
 
-                selector.add(newClient); // todo: client should register in the selector by itself
-                clientMonitor.insertClient(newClient);
+                clientMonitor.insertClient(newClientSocket, newClient);
+
+                clientMonitor.status();
             }
             catch (TCPListener::TCPListenerError e){
-                // todo: handle event (rebuild listener?)
+                std::cout << e.what() << std::endl;
             }
         }
 
         for(TCPSocket& socket: selector.getReadReadySockets())
         {
-            clientMonitor.notifyRead(socket);
+            try{
+                clientMonitor.notifyRead(socket);
+            }
+            catch(TCPSocket::IOError& e){
+                clientMonitor.removeClient(socket);
+                clientMonitor.status();
+            }
+            catch(TCPSocket::ConnectionClosed& e){
+                clientMonitor.removeClient(socket);
+                clientMonitor.status();
+            }
         }
 
         for(TCPSocket& socket: selector.getWriteReadySockets())
         {
-            clientMonitor.notifyWrite(socket);
+            try{
+                clientMonitor.notifyWrite(socket);
+            }
+            catch(TCPSocket::IOError& e){
+                clientMonitor.removeClient(socket);
+                clientMonitor.status();
+            }
+            catch(TCPSocket::ConnectionClosed& e){
+                clientMonitor.removeClient(socket);
+                clientMonitor.status();
+            }
         }
 
     }

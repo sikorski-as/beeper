@@ -1,17 +1,28 @@
 #ifndef BEEPER_CLIENT_H
 #define BEEPER_CLIENT_H
 
+#include <string>
+#include <thread>
+#include "../src/IONotifiable.h"
 #include "../src/TCPSocket.h"
+#include "../src/CommunicationStack.h"
 #include "Event.h"
 
-class Client{
-public:
-    Client(TCPSocket&);
-    TCPSocket getSocket();
-    std::string getUsername();
-    void insertIntoQueue(Event);
+class Client : public IONotifiable{
+    std::string username;
+    CommunicationStack * communicationStack;
 
-    void notify();
+    std::thread clientThread;
+    void clientThreadTask();
+public:
+    Client(CommunicationStack*);
+    ~Client();
+
+
+    std::string getUsername();
+
+    void notifyRead() override;
+    void notifyWrite() override;
 };
 
 
