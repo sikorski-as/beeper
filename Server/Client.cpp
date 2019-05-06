@@ -36,6 +36,7 @@ void Client::clientThreadTask() {
                 if(e["username"] == "admin") {
                     username = "admin";
                     std::cout << "admin has logged in" << std::endl;
+                    communicationStack->sendEvent(WelcomeMessage());
                 }
             }
             else if(e["type"] == "SHUTDOWN"){
