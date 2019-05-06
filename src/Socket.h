@@ -1,33 +1,40 @@
-//
-// Created by hubertborkowski on 11.04.19.
-//
-
 #ifndef BEEPER_SOCKET_H
 #define BEEPER_SOCKET_H
 
-#include <cstring>
-#include <iostream>
 #include <netinet/in.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netdb.h>
 #include <unistd.h>
+#include <exception>
+#include <string>
 
-using Address = sockaddr_in;
+#include "Address.h"
+//#include "Selector.h"
 
+class Selector;
 class Socket 
 {
 public:
-  Socket(Address address);
-  Socket(int newSocketDescriptor, Address address);
-
-
-  virtual void close();
-
+    friend class Selector;
+    Address getLocalAddress();
+    bool operator==(const Socket&);
+    int getDescriptor() const;
+    void close();
 protected:
-  int socketDescriptor;
-  Address address;
-};
+    int socketDescriptor;
+    Socket();
+    Socket(int newSocketDescriptor);
 
+    class SocketError : public std::exception{
+    protected:
+        std::string reason;
+        int code;
+    public:
+        SocketError(std::string reason, int errorCode = 0)
+        : reason(reason + " (" + std::to_string(code) + ")"), code(errorCode){
+
+        }
+        virtual const char* what() { return reason.c_str();}
+    };
+};
 
 #endif //BEEPER_SOCKET_H
