@@ -1,6 +1,8 @@
 #include "Buffer.h"
+#include <arpa/inet.h>
+#include <iostream>
 
-std::size_t Buffer::getSize() {
+int Buffer::getSize() {
     return data.size();
 }
 
@@ -14,21 +16,21 @@ void Buffer::append(const char * buffer, std::size_t size) {
     }
 }
 
-void Buffer::append(char byte) {
-    data.push_back(byte);
-}
+//void Buffer::append(char byte) {
+//    data.push_back(byte);
+//}
 
-void Buffer::append(bool boolean) {
-    append(reinterpret_cast<char*>(&boolean), sizeof(bool));
-}
+//void Buffer::append(bool boolean) {
+//    append(reinterpret_cast<char*>(&boolean), sizeof(bool));
+//}
 
 void Buffer::append(int number) {
     append(reinterpret_cast<char*>(&number), sizeof(int));
 }
 
-void Buffer::append(std::size_t number) {
-    append(reinterpret_cast<char*>(&number), sizeof(std::size_t));
-}
+//void Buffer::append(std::size_t number) {
+//    append(reinterpret_cast<char*>(&number), sizeof(std::size_t));
+//}
 
 
 void Buffer::append(std::string text) {
@@ -42,4 +44,12 @@ void Buffer::consume(std::size_t consumedBytes) {
     else{
         data = std::vector<char>(data.begin() + consumedBytes, data.end());
     }
+}
+
+void Buffer::printContent() {
+    std::cout << "content of packet (size=" << getSize() << "): ";
+    for(auto& byte: data){
+        std::cout << int(byte) << ',';
+    }
+    std::cout << std::endl;
 }

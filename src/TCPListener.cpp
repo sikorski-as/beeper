@@ -51,7 +51,7 @@ TCPSocket TCPListener::accept()
 
     socklen_t remoteAddressLength;
     Address remoteAddress;
-    int newSocketDescriptor = ::accept(socketDescriptor, (sockaddr*)&remoteAddress, &remoteAddressLength);
+    int newSocketDescriptor = ::accept4(socketDescriptor, (sockaddr*)&remoteAddress, &remoteAddressLength, 0);
 
     if(newSocketDescriptor < 0)
     {

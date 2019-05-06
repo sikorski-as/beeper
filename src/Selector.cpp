@@ -1,72 +1,105 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <iostream>
+
 #include "Selector.h"
+#include "TCPSocket.h"
+#include "TCPListener.h"
 #include "Socket.h"
 
-int Selector::find(const Socket& socket){
+//
+// protected
+//
+
+int Selector::find(const TCPSocket& socket){
     int pos = -1;
-    auto fd = socket.socketDescriptor;
-    for(int i = 0; i < socketDescriptors.size(); i++){
-        if(socketDescriptors[i] == fd){
+    for(int i = 0; i < sockets.size(); i++){
+        if(sockets[i] == socket){
             pos = i;
         }
     }
     return pos;
 }
 
-bool Selector::isPresent(const Socket& socket){
+bool Selector::isPresent(const TCPSocket& socket){
     return find(socket) != -1;
 }
 
-Selector::Selector(bool readSelector, bool writeSelector, bool signalSelector) {
-    this->readSelector = readSelector;
-    this->writeSelector = writeSelector;
-    this->signalSelector = signalSelector;
+std::vector<int> Selector::getSocketDescriptors() {
+    std::vector<int> descriptors;
+
+    for(auto& socket: sockets){
+        descriptors.push_back(socket.getDescriptor());
+    }
+
+    return descriptors;
+}
+
+//
+// public
+//
+
+Selector::Selector(const TCPListener& listener) {
+    this->listener = listener;
     FD_ZERO(&read);
     FD_ZERO(&write);
     FD_ZERO(&signal);
 }
 
-void Selector::setupSelector(bool readSelector, bool writeSelector, bool signalSelector){
-    this->readSelector = readSelector;
-    this->writeSelector = writeSelector;
-    this->signalSelector = signalSelector;
+void Selector::setListener(const TCPListener& newListener){
+    std::lock_guard<std::mutex> lock(access);
+    listener = newListener;
 }
 
-void Selector::add(const Socket& socket){
+bool Selector::isListenerReady(){
+    return FD_ISSET(listener.getDescriptor(), &read)
+    || FD_ISSET(listener.getDescriptor(), &write)
+    || FD_ISSET(listener.getDescriptor(), &signal);
+}
+
+void Selector::add(const TCPSocket& socket){
+    std::lock_guard<std::mutex> lock(access);
     if(!isPresent(socket)){
-        auto fd = socket.socketDescriptor;
-        socketDescriptors.push_back(fd);
+        sockets.push_back(socket);
     }
+    std::cout << "sockets in selector: " << sockets.size() << std::endl;
 }
 
-void Selector::remove(const Socket& socket){
+void Selector::remove(const TCPSocket& socket){
+    std::lock_guard<std::mutex> lock(access);
     int pos = find(socket);
     if(pos != -1){
-        socketDescriptors.erase(socketDescriptors.begin() + pos);
+        sockets.erase(sockets.begin() + pos);
     }
 }
 
 void Selector::clear(){
-    socketDescriptors.clear();
+    std::lock_guard<std::mutex> lock(access);
+    sockets.clear();
 }
 
 int Selector::wait(int timeoutInSeconds){
     FD_ZERO(&read);
     FD_ZERO(&write);
     FD_ZERO(&signal);
+
     int max = -1;
+
+    std::vector<int> socketDescriptors;
+    {
+        std::lock_guard<std::mutex> lock(access);
+        socketDescriptors = getSocketDescriptors();
+    }
+    socketDescriptors.push_back(listener.getDescriptor());
+
     for(auto fd: socketDescriptors){
         if(fd > max){
             max = fd;
         }
-        if(readSelector)
-            FD_SET(fd, &read);
-        if(writeSelector)
-            FD_SET(fd, &write);
-        if(signalSelector)
-            FD_SET(fd, &signal);
+
+        FD_SET(fd, &read);
+        FD_SET(fd, &write);
+        FD_SET(fd, &signal);
     }
 
     timeval* timeout = nullptr;
@@ -75,7 +108,7 @@ int Selector::wait(int timeoutInSeconds){
         timeout->tv_sec = timeoutInSeconds;
         timeout->tv_usec = 0;
     }
-    int howManyActive = select(max + 1, &read, &write, &signal, timeout); // 0 = no timeout
+    int howManyActive = select(max + 1, &read, &write, &signal, timeout); // timeout <= 0 means waiting forever
     if(timeout != nullptr)
         delete timeout;
 
@@ -85,17 +118,22 @@ int Selector::wait(int timeoutInSeconds){
     return howManyActive;
 }
 
-bool Selector::isReadReady(const Socket& socket){
-    auto fd = socket.socketDescriptor;
-    return FD_ISSET(fd, &read);
+std::vector<TCPSocket> Selector::getReadReadySockets(){
+    std::vector<TCPSocket> readReadySockets;
+    for(const TCPSocket& socket: sockets){
+        if(FD_ISSET(socket.getDescriptor(), &read)){
+            readReadySockets.push_back(socket);
+        }
+    }
+    return  readReadySockets;
 }
 
-bool Selector::isWriteReady(const Socket& socket){
-    auto fd = socket.socketDescriptor;
-    return FD_ISSET(fd, &write);
-}
-
-bool Selector::isSignalReady(const Socket& socket){
-    auto fd = socket.socketDescriptor;
-    return FD_ISSET(fd, &signal);
+std::vector<TCPSocket> Selector::getWriteReadySockets(){
+    std::vector<TCPSocket> writeReadySockets;
+    for(const TCPSocket& socket: sockets){
+        if(FD_ISSET(socket.getDescriptor(), &write)){
+            writeReadySockets.push_back(socket);
+        }
+    }
+    return  writeReadySockets;
 }
