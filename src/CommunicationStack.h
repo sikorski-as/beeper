@@ -1,7 +1,7 @@
 #ifndef BEEPER_COMMUNICATIONSTACK_H
 #define BEEPER_COMMUNICATIONSTACK_H
 
-#include "../Server/Event.h"
+#include "Event.h"
 #include "../src/IONotifiable.h"
 
 class CommunicationStack : public IONotifiable{

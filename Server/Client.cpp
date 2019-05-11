@@ -32,25 +32,36 @@ void Client::clientThreadTask() {
 
         try{
             auto e = communicationStack->getEvent();
+
             if(e["type"] == "LOGIN_REQUEST"){
-                if(e["username"] == "admin") {
-                    username = "admin";
-                    std::cout << "admin has logged in" << std::endl;
-                    communicationStack->sendEvent(WelcomeMessage());
-                }
-            }
-            else if(e["type"] == "SHUTDOWN"){
-                server.stop();
+                handleLoginRequest(LoginRequest(e));
             }
             else{
-                std::cout << "unknown request" << std::endl;
+                std::cout << "got unknown request:" << std::endl;
+                std::cout << "\t" << e.dump() << std::endl;
                 communicationStack->sendEvent(UnknownRequest());
             }
         }
+        catch (EventNotValid e){
+            std::cout << "request not valid" << std::endl;
+            communicationStack->sendEvent(MalformedRequest(e.reason));
+        }
         catch (...){
-            std::cout << "request error" << std::endl; // todo: handle errors
+            std::cout << "unforeseen service error" << std::endl;
         }
 
     }
     server.clientMonitor.removeClient(this);
+}
+
+void Client::handleLoginRequest(LoginRequest request) {
+    if(request.username == "admin" && request.password == "admin"){
+        std::cout << "admin has logged in" << std::endl;
+
+        username = request.username;
+        communicationStack->sendEvent(LoginResponse(true, "<session_token>"));
+    }
+    else{
+        communicationStack->sendEvent(LoginResponse(false, ""));
+    }
 }

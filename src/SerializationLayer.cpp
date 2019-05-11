@@ -1,4 +1,6 @@
 #include "SerializationLayer.h"
+
+#include "Event.h"
 #include <string>
 #include <iostream>
 
@@ -10,19 +12,18 @@ Event SerializationLayer::deserialize() {
             Buffer b = packetQueue.get();
             e = Event::parse(b.getData());
 
-            //if(e["type"].is_string())
             return e;
         }
         catch(...){
-            // malformed json
-            // std::cout << "bad data, deserialization failed\n\n";
+            throw EventNotValid("Malformed payload");
         }
     }
 }
 
 void SerializationLayer::serialize(Event e) {
     Buffer packet;
-    packet.append(e.dump());
+    auto s = e.dump();
+    packet.append(s);
     lowerLayer->handlePacket(packet);
 }
 

@@ -5,7 +5,7 @@
 #include "../src/SerializationLayer.h"
 #include "../src/TCPSocket.h"
 #include "../src/TCPLayer.h"
-#include "../Server/Event.h"
+#include "Event.h"
 
 class TCPCommunicationStack : public CommunicationStack{
     SerializationLayer serializationLayer;

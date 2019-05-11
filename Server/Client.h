@@ -6,7 +6,7 @@
 #include "../src/IONotifiable.h"
 #include "../src/TCPSocket.h"
 #include "../src/CommunicationStack.h"
-#include "Event.h"
+#include "../src/Event.h"
 
 class Client : public IONotifiable{
     std::string username;
@@ -18,11 +18,11 @@ public:
     Client(CommunicationStack*);
     ~Client();
 
-
     std::string getUsername();
-
     void notifyRead() override;
     void notifyWrite() override;
+
+    void handleLoginRequest(LoginRequest);
 };
 
 

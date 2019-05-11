@@ -1,74 +1,105 @@
 #include <iostream>
 #include <string>
 #include <exception>
+#include <thread>
+#include <mutex>
 #include "../src/Address.h"
 #include "../src/TCPClientSocket.h"
 #include "../src/Buffer.h"
 #include "../src/TCPCommunicationStack.h"
 #include <arpa/inet.h>
 
+TCPCommunicationStack* communicationStack = nullptr;
+
+void readTask(){
+    while(true){
+        communicationStack->notifyRead();
+    }
+}
+
+void writeTask(){
+    while(true){
+        communicationStack->notifyWrite();
+    }
+}
+
 int main()
 {
-    std::string mode = "write";
-
     TCPClientSocket socket;
+
+    std::cout << "Starting client..." << std::endl;
+    sleep(1);
+
     try{
         socket.connect(CreateAddress("127.0.0.1", 62137));
+
+        std::cout << "Connected!" << std::endl;
+        Address local = socket.getLocalAddress();
+        std::cout << "Local address: " << GetAddressAndPortAsString(local) << std::endl;
+        Address remote = socket.getRemoteAddress();
+        std::cout << "Server address: " << GetAddressAndPortAsString(remote) << std::endl;
     }
     catch(TCPSocket::TCPSocketError& e){
         std::cout << e.what() << std::endl;
         return 1;
     }
 
-    std::cout << "connected!" << std::endl;
-    Address local = socket.getLocalAddress();
-    std::cout << "local address: " << GetAddressAndPortAsString(local) << std::endl;
-    Address remote = socket.getRemoteAddress();
-    std::cout << "server address: " << GetAddressAndPortAsString(remote) << std::endl;
+    sleep(1);
 
     try{
-        if(mode == "read"){
-            TCPCommunicationStack communicationStack(socket);
-            while(true){
-                try{
-                    sleep(2);
-                    communicationStack.notifyRead();
-                    communicationStack.notifyRead();
+        communicationStack = new TCPCommunicationStack(socket);
+        std::thread notifier1(readTask); notifier1.detach();
+        std::thread notifier2(writeTask); notifier2.detach();
 
-                    Event e = communicationStack.getEvent();
-                    std::cout << "got:" << e.dump() << std::endl;
+        try{
+            for(int i = 1; i <= 3; i++){
+                std::string username, password;
+
+                std::cout << "Logging in [chance " << i << " out of 3]:" << std::endl;
+                std::cout << "Username: "; std::cin >> username;
+                std::cout << "Password: "; std::cin >> password;
+
+                std::cout << "Sending login request..." << std::endl;
+                sleep(1);
+
+                communicationStack->sendEvent(LoginRequest(username, password));
+
+                auto e = communicationStack->getEvent();
+                if(e["type"] == "LOGIN_RESPONSE"){
+                    auto response = LoginResponse(e);
+                    if(response.status){
+                        std::cout << "You just logged in" << std::endl;
+                        break;
+                    }
+                    else{
+                        std::cout << "Login failed" << std::endl;
+                    }
                 }
-                catch (TCPSocket::ConnectionClosed & e){
-                    std::cout << std::endl << e.what() << std::endl;
-                    std::cout << "closing app...\n";
-                    return 0;
+                else if(e["type"] == "UNKNOWN_REQUEST"){
+                    auto response = UnknownRequest();
+                    std::cout << "You sent request of unknown type" << std::endl;
+                }
+                else if(e["type"] == "MALFORMED_REQUEST"){
+                    auto response = MalformedRequest();
+                    std::cout << "You sent malformed request" << std::endl;
+                }
+                else{
+                    std::cout << "Server sent unknown type of response" << std::endl;
                 }
             }
         }
-        else if (mode == "write"){
-            TCPCommunicationStack communicationStack(socket);
-            while(true){
-                std::string message;
-                std::cout << "message to send: ";
-                std::getline(std::cin, message);
-                if(message.length() == 0){
-                    std::cout << "message cannot be empty!" << std::endl;
-                    continue;
-                }
-                Buffer b;
-                b.append(htonl(message.size() + 1));
-                b.append(message);
-                while(b.getSize() > 0){
-                    int sentBytes = socket.send(b.getData(), b.getSize());
-                    b.consume(sentBytes);
-                }
-            }
+        catch(EventNotValid& e){
+            std::cout << "Server sent invalid response" << std::endl;
         }
-        else{
-            return 1;
-        }
+
+        std::cout << "Closing client..." << std::endl;
+        sleep(2);
+
+        notifier1.~thread(); notifier2.~thread();
+        delete communicationStack;
+        exit(0);
     }
-    catch (TCPSocket::ConnectionClosed & e){
+    catch(TCPSocket::ConnectionClosed & e){
         std::cout << std::endl << e.what() << std::endl;
         std::cout << "closing app...\n";
         return 0;

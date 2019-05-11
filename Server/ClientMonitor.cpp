@@ -136,7 +136,8 @@ void ClientMonitor::notifyWrite(TCPSocket & socket) {
 
 void ClientMonitor::status() {
     std::lock_guard<std::mutex> lock(clientListAccess);
-    std::cout << "client monitor status\n";
-    std::cout << "\tentries in socketToClient map: " << socketToClientMap.size() << "\n";
-    std::cout << "\tentries in clients vector: " << clients.size() << "\n";
+    // std::cout << "client monitor status\n";
+    // std::cout << "\tentries in socketToClient map: " << socketToClientMap.size() << "\n";
+    // std::cout << "\tentries in clients vector: " << clients.size() << "\n";
+    std::cout << "clients on server: " << clients.size() << std::endl;
 }

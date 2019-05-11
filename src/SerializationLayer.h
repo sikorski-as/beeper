@@ -2,7 +2,7 @@
 #define BEEPER_SERIALIZATIONLAYER_H
 
 #include <queue>
-#include "../Server/Event.h"
+#include "Event.h"
 #include "SynchronizedQueue.h"
 #include "Buffer.h"
 #include "PacketHandler.h"
