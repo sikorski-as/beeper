@@ -27,11 +27,12 @@ add_executable( beeper_server
         src/TCPLayer.cpp src/TCPLayer.h
 
         src/json.hpp
-        )
+        src/Database.cpp src/Database.h)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-target_link_libraries(beeper_server Threads::Threads)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/sqlite3)
+target_link_libraries(beeper_server Threads::Threads pthread dl)
 
 add_executable( beeper_client
         Client/main.cpp
