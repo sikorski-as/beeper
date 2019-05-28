@@ -25,9 +25,9 @@ public:
 
   void deleteUser(int id);
 
-  void changeUserAlias(std::string alias);
+  void changeUserAlias(int id, std::string alias);
 
-  void changeUserBio(std::string bio);
+  void changeUserBio(int id, std::string bio);
 
   void addPost(int userId, std::string content);
 private:

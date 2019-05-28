@@ -56,14 +56,40 @@ void Database::deleteUser(int id)
 	}
 }
 
-void Database::changeUserAlias(std::string alias)
+void Database::changeUserAlias(int id, std::string alias)
 {
+	char* errorMsg = nullptr;
+	std::string query = "update user set alias = " + alias + " where id = " + std::to_string(id) + " ;";
 
+	int success = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
+
+	if(success)
+	{
+		std::cout << "Alias changed successfully" << std::endl;
+	}
+	else
+	{
+		std::cout << "Error while changing alias: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
 }
 
-void Database::changeUserBio(std::string bio)
+void Database::changeUserBio(int id, std::string bio)
 {
+	char* errorMsg = nullptr;
+	std::string query = "update user set alias = " + alias + " where id = " + std::to_string(id) + " ;";
 
+	int success = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
+
+	if(success)
+	{
+		std::cout << "Alias changed successfully" << std::endl;
+	}
+	else
+	{
+		std::cout << "Error while changing alias: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
 }
 
 void Database::addPost(int userId, std::string content)
