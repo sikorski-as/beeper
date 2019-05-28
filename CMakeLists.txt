@@ -28,7 +28,7 @@ add_executable( beeper_server
 
         src/json.hpp
         sqlite3/sqlite3.h sqlite3/sqlite3.c sqlite3/sqlite3ext.h
-        src/Database.cpp src/Database.h)
+        src/Database.cpp src/Database.h database-objects/User.h database-objects/Post.h)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
