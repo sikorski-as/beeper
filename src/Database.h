@@ -5,7 +5,7 @@
 #ifndef BEEPER_DATABASE_H
 #define BEEPER_DATABASE_H
 
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include <string>
 #include <iostream>
 
@@ -29,7 +29,22 @@ public:
 
   void changeUserBio(int id, std::string bio);
 
+  void getUserById(int id);
+
+  void getUserByUsername(std::string username);
+
   void addPost(int userId, std::string content);
+
+  void deletePost(int id);
+
+  void getPostById(int id);
+
+  void getPostByUserId(int userId);
+
+  void getLikesForPost(int postId);
+
+  void getLikedPostsForUser(int userId);
+
 private:
   sqlite3* database;
 

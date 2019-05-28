@@ -27,6 +27,7 @@ add_executable( beeper_server
         src/TCPLayer.cpp src/TCPLayer.h
 
         src/json.hpp
+        sqlite3/sqlite3.h sqlite3/sqlite3.c sqlite3/sqlite3ext.h
         src/Database.cpp src/Database.h)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
