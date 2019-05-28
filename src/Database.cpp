@@ -2,7 +2,27 @@
 // Created by hubertborkowski on 28.05.19.
 //
 
+#include <vector>
 #include "Database.h"
+#include "../database-objects/User.h"
+#include "../database-objects/Post.h"
+
+User* Database::storedUser = nullptr;
+Post* Database::storedPost = nullptr;
+std::vector<Post>* Database::storedPostVector = nullptr;
+std::vector<User>* Database::storedUserVector = nullptr;
+
+static int make_user_callback(void *data, int nr_cols, char **field, char **colName)
+{
+	int id = std::stoi(field[0]);
+	std::string username(field[1]);
+	std::string alias(field[2]);
+	std::string bio(field[3]);
+
+	Database::storedUser = new User(id, username, alias, bio);
+
+	return 0;
+}
 
 void Database::openDB(std::string fileName)
 {
@@ -111,12 +131,26 @@ void Database::addPost(int userId, std::string content)
 	}
 }
 
-void Database::getUserById(int id)
+User Database::getUserById(int id)
 {
+	char* errorMsg = nullptr;
+	std::string query = "select * from users where id = " + std::to_string(id) + ";";
 
+	int success = sqlite3_exec(database, query.c_str(), make_user_callback, nullptr, &errorMsg);
+
+	if(success)
+	{
+		std::cout << "Post added successfully" << std::endl;
+		return *Database::storedUser;
+	}
+	else
+	{
+		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
 }
 
-void Database::getUserByUsername(std::string username)
+User Database::getUserByUsername(std::string username)
 {
 
 }
@@ -126,23 +160,43 @@ void Database::deletePost(int id)
 
 }
 
-void Database::getPostById(int id)
+Post Database::getPostById(int id)
 {
 
 }
 
-void Database::getPostByUserId(int userId)
+std::vector<Post> Database::getPostsByUserId(int userId)
 {
 
 }
 
-void Database::getLikesForPost(int postId)
+std::vector<User> Database::getLikesForPost(int postId)
 {
 
 }
 
-void Database::getLikedPostsForUser(int userId)
+std::vector<Post> Database::getLikedPostsForUser(int userId)
 {
 
 }
+
+//void Database::setStoredUser(User* storedUser)
+//{
+//	Database::storedUser = storedUser;
+//}
+//
+//void Database::setStoredUserVector(const std::vector<User>& storedUserVector)
+//{
+//	Database::storedUserVector = storedUserVector;
+//}
+//
+//void Database::setStoredPost(const Post& storedPost)
+//{
+//	Database::storedPost = storedPost;
+//}
+//
+//void Database::setStoredPostVector(const std::vector<Post>& storedPostVector)
+//{
+//	Database::storedPostVector = storedPostVector;
+//}
 

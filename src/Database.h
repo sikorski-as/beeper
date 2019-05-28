@@ -6,8 +6,11 @@
 #define BEEPER_DATABASE_H
 
 #include "sqlite3.h"
+#include "../database-objects/User.h"
+#include "../database-objects/Post.h"
 #include <string>
 #include <iostream>
+#include <vector>
 
 class Database
 {
@@ -29,21 +32,37 @@ public:
 
   void changeUserBio(int id, std::string bio);
 
-  void getUserById(int id);
+  User getUserById(int id);
 
-  void getUserByUsername(std::string username);
+  User getUserByUsername(std::string username);
 
   void addPost(int userId, std::string content);
 
   void deletePost(int id);
 
-  void getPostById(int id);
+  Post getPostById(int id);
 
-  void getPostByUserId(int userId);
+  std::vector<Post> getPostsByUserId(int userId);
 
-  void getLikesForPost(int postId);
+  std::vector<User> getLikesForPost(int postId);
 
-  void getLikedPostsForUser(int userId);
+  std::vector<Post> getLikedPostsForUser(int userId);
+
+  static void setStoredUser(User* storedUser);
+
+  static void setStoredUserVector(const std::vector<User>& storedUserVector);
+
+  static void setStoredPost(const Post& storedPost);
+
+  static void setStoredPostVector(const std::vector<Post>& storedPostVector);
+
+  static User* storedUser;
+
+  static std::vector<User>* storedUserVector;
+
+  static Post* storedPost;
+
+  static std::vector<Post>* storedPostVector;
 
 private:
   sqlite3* database;
