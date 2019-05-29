@@ -14,7 +14,7 @@ Client::~Client() {
 }
 
 std::string Client::getUsername(){
-    return username;
+    return user.getUsername();
 }
 
 void Client::notifyRead() {
@@ -55,10 +55,12 @@ void Client::clientThreadTask() {
 }
 
 void Client::handleLoginRequest(LoginRequest request) {
-    if(request.username == "admin" && request.password == "admin"){
-        std::cout << "admin has logged in" << std::endl;
+	User temp = database->getUserByUsername(request.username);
 
-        username = request.username;
+    if(temp.getPassword() == request.password){
+
+        user = temp;
+
         communicationStack->sendEvent(LoginResponse(true, "<session_token>"));
     }
     else{

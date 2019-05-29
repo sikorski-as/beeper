@@ -19,6 +19,8 @@ public:
 	  this->password = password;
   }
 
+  User() = default;
+
   int getId() const
   {
 	  return id;

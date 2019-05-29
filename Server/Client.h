@@ -7,9 +7,12 @@
 #include "../src/TCPSocket.h"
 #include "../src/CommunicationStack.h"
 #include "../src/Event.h"
+#include "../database-objects/User.h"
+#include "../src/Database.h"
 
 class Client : public IONotifiable{
-    std::string username;
+    User user;
+  	Database* database;
     CommunicationStack * communicationStack;
 
     std::thread clientThread;
