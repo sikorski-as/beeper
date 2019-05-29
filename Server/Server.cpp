@@ -4,7 +4,7 @@
 #include "Server.h"
 #include "../src/TCPCommunicationStack.h"
 
-Server::Server() : listener(), selector(listener), clientMonitor(selector) {
+Server::Server() : listener(), selector(listener), clientMonitor(selector), database() {
     running = false;
 }
 
@@ -12,6 +12,9 @@ void Server::start(Address address, int queueLength) {
     if(!running){
         listener.start(address, queueLength);
         selector.setListener(listener);
+
+        database.openDB("beeber.db");
+
         running = true;
         std::thread communicationThread(&Server::communicationThreadTask, this);
         communicationThread.join();
@@ -27,6 +30,7 @@ void Server::stop() {
         clientMonitor.removeAllClients(); // todo: nice way to inform clients about stopping server
         listener.close();
         selector.clear();
+        database.closeDB();
 
         running = false;
         // todo: let restart server nicely

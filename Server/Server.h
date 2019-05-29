@@ -2,6 +2,7 @@
 #define BEEPER_SERVER_H
 
 #include <atomic>
+#include <unistd.h>
 #include "../src/TCPListener.h"
 #include "../src/Selector.h"
 #include "ClientMonitor.h"
@@ -15,6 +16,7 @@ class Server {
 public:
     Selector selector;
     ClientMonitor clientMonitor;
+  	Database database;
 
     Server();
     void start(Address, int);
