@@ -79,7 +79,7 @@ void Database::deleteUser(int id)
 void Database::changeUserAlias(int id, std::string alias)
 {
 	char* errorMsg = nullptr;
-	std::string query = "update user set alias = " + alias + " where id = " + std::to_string(id) + " ;";
+	std::string query = "update user set alias = '" + alias + "' where id = " + std::to_string(id) + " ;";
 
 	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
 
@@ -97,7 +97,7 @@ void Database::changeUserAlias(int id, std::string alias)
 void Database::changeUserBio(int id, std::string bio)
 {
 	char* errorMsg = nullptr;
-	std::string query = "update user set bio = " + bio + " where id = " + std::to_string(id) + " ;";
+	std::string query = "update user set bio = '" + bio + "' where id = " + std::to_string(id) + " ;";
 
 	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
 
@@ -116,7 +116,7 @@ void Database::addPost(int userId, std::string content)
 {
 	char* errorMsg = nullptr;
 	std::string query = "insert into posts (user_id, content) values (" +
-						std::to_string(userId) + "," + content + ");";
+						std::to_string(userId) + ",'" + content + "');";
 
 	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
 
@@ -152,7 +152,21 @@ User Database::getUserById(int id)
 
 User Database::getUserByUsername(std::string username)
 {
+	char* errorMsg = nullptr;
+	std::string query = "select * from users where username = '" + username + "';";
 
+	int failure = sqlite3_exec(database, query.c_str(), make_user_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
+	else
+	{
+		std::cout << "Post added successfully" << std::endl;
+		return *Database::storedUser;
+	}
 }
 
 void Database::deletePost(int id)
