@@ -26,6 +26,7 @@ public:
     void notifyWrite() override;
 
     void handleLoginRequest(LoginRequest);
+  	void handleLogoutREquest(LogoutRequest);
 };
 
 

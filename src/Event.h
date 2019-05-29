@@ -146,4 +146,62 @@ public:
     }
 };
 
+class LogoutRequest
+{
+public:
+  std::string username;
+
+  LogoutRequest(std::string _username){
+      username = _username;
+  }
+
+  explicit LogoutRequest(Event e){
+      if(!checkEventKeys(e, {"type", "username"})) {
+          throw EventNotValid("Improper LOGOUT_REQUEST");
+      }
+      try{
+          username = e["username"].get<std::string>();
+      }
+      catch(...){
+          throw EventNotValid("Improper LOGOUT_REQUEST");
+      }
+  }
+
+  operator Event(){
+      Event e;
+      e["type"] = "LOGOUT_REQUEST";
+      e["username"] = username;
+      return e;
+  }
+};
+
+class LogoutResponse
+{
+public:
+  bool status;
+
+  LogoutResponse(bool _status, std::string _token){
+      status = _status;
+  }
+
+  explicit LogoutResponse(Event e){
+      if(!checkEventKeys(e, {"type", "status"})) {
+          throw EventNotValid("Improper LOGOUT_RESPONSE");
+      }
+      try{
+          status = e["status"].get<bool>();
+      }
+      catch(...){
+          throw EventNotValid("Improper LOGOUT_RESPONSE");
+      }
+  }
+
+  operator Event(){
+      Event e;
+      e["type"] = "LOGOUT_RESPONSE";
+      e["status"] = status;
+      return e;
+  }
+};
+
 #endif //BEEPER_EVENT_H

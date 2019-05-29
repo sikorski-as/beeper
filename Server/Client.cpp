@@ -33,10 +33,16 @@ void Client::clientThreadTask() {
         try{
             auto e = communicationStack->getEvent();
 
-            if(e["type"] == "LOGIN_REQUEST"){
+            if(e["type"] == "LOGIN_REQUEST")
+			{
                 handleLoginRequest(LoginRequest(e));
             }
-            else{
+			if(e["type"] == "LOGOUT_REQUEST")
+			{
+				handleLogoutREquest(LogoutRequest(e));
+			}
+            else
+			{
                 std::cout << "got unknown request:" << std::endl;
                 std::cout << "\t" << e.dump() << std::endl;
                 communicationStack->sendEvent(UnknownRequest());
@@ -66,4 +72,17 @@ void Client::handleLoginRequest(LoginRequest request) {
     else{
         communicationStack->sendEvent(LoginResponse(false, ""));
     }
+}
+
+void Client::handleLogoutREquest(LogoutRequest request)
+{
+	if(user.getUsername() == request.username)
+	{
+		communicationStack->sendEvent(LogoutResponse(true));
+		server.clientMonitor.removeClient(this);
+	}
+	else
+	{
+		communicationStack->sendEvent(LogoutResponse(false));
+	}
 }
