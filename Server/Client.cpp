@@ -2,6 +2,13 @@
 #include "Client.h"
 #include "Server.h"
 
+typedef void(Client::*event_handling_function)(Event);
+
+static std::map<std::string, event_handling_function> serviceFunctionsMap = {
+		{"LOGIN_REQUEST", &Client::handleLoginRequest},
+		{"LOGOUT_REQUEST", &Client::handleLogoutREquest}
+};
+
 extern Server server;
 
 Client::Client(CommunicationStack* communicationStack)
@@ -33,15 +40,9 @@ void Client::clientThreadTask() {
         try{
             auto e = communicationStack->getEvent();
 
-            if(e["type"] == "LOGIN_REQUEST")
-			{
-                handleLoginRequest(LoginRequest(e));
-            }
-			if(e["type"] == "LOGOUT_REQUEST")
-			{
-				handleLogoutREquest(LogoutRequest(e));
-			}
-            else
+			serviceFunctionsMap[e["type"]](e);
+
+            if()//todo: handle unknown request
 			{
                 std::cout << "got unknown request:" << std::endl;
                 std::cout << "\t" << e.dump() << std::endl;
@@ -61,7 +62,7 @@ void Client::clientThreadTask() {
 }
 
 void Client::handleLoginRequest(LoginRequest request) {
-	User temp = database->getUserByUsername(request.username);
+	User temp = server.database.getUserByUsername(request.username);
 
     if(temp.getPassword() == request.password){
 

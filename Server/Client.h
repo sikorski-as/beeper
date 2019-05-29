@@ -12,7 +12,6 @@
 
 class Client : public IONotifiable{
     User user;
-  	Database* database;
     CommunicationStack * communicationStack;
 
     std::thread clientThread;
