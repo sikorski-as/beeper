@@ -9,8 +9,8 @@
 
 User* Database::storedUser = nullptr;
 Post* Database::storedPost = nullptr;
-std::vector<Post>* Database::storedPostVector = nullptr;
-std::vector<User>* Database::storedUserVector = nullptr;
+std::vector<Post>* Database::storedPostVector = new std::vector<Post>();
+std::vector<User>* Database::storedUserVector = new std::vector<User>();
 
 static int make_user_callback(void *data, int nr_cols, char **field, char **colName)
 {
@@ -24,6 +24,18 @@ static int make_user_callback(void *data, int nr_cols, char **field, char **colN
 	return 0;
 }
 
+static int add_user_callback(void *data, int nr_cols, char **field, char **colName)
+{
+	int id = std::stoi(field[0]);
+	std::string username(field[1]);
+	std::string alias(field[2]);
+	std::string bio(field[3]);
+
+	Database::storedUserVector->push_back(User(id, username, alias, bio));
+
+	return 0;
+}
+
 static int make_post_callback(void* data, int nr_cols, char** field, char** colName)
 {
 	int id = std::stoi(field[0]);
@@ -31,6 +43,17 @@ static int make_post_callback(void* data, int nr_cols, char** field, char** colN
 	std::string content(field[2]);
 
 	Database::storedPost = new Post(id, userId, content);
+
+	return 0;
+}
+
+static int add_post_callback(void* data, int nr_cols, char** field, char** colName)
+{
+	int id = std::stoi(field[0]);
+	int userId = std::stoi(field[1]);
+	std::string content(field[2]);
+
+	Database::storedPostVector->push_back(Post(id, userId, content));
 
 	return 0;
 }
@@ -219,16 +242,60 @@ Post Database::getPostById(int id)
 
 std::vector<Post> Database::getPostsByUserId(int userId)
 {
+	char* errorMsg = nullptr;
+	std::string query = "select * from posts where user_id = " + std::to_string(userId) + ";";
 
+	int failure = sqlite3_exec(database, query.c_str(), add_post_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
+	else
+	{
+		std::cout << "Post added successfully" << std::endl;
+		return *Database::storedPostVector;
+	}
 }
 
 std::vector<User> Database::getLikesForPost(int postId)
 {
+	char* errorMsg = nullptr;
+	std::string query = "select * from users inner join likes on likes.user_id = users.id "
+			" where likes.post_id = " + std::to_string(postId) + ";";
 
+	int failure = sqlite3_exec(database, query.c_str(), add_user_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
+	else
+	{
+		std::cout << "Post added successfully" << std::endl;
+		return *Database::storedUserVector;
+	}
 }
 
 std::vector<Post> Database::getLikedPostsForUser(int userId)
 {
+	char* errorMsg = nullptr;
+	std::string query = "select * from posts inner join likes on likes.post_id = posts.id "
+			"where likes.user_id = " + std::to_string(userId) + ";";
 
+	int failure = sqlite3_exec(database, query.c_str(), add_post_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
+	else
+	{
+		std::cout << "Post added successfully" << std::endl;
+		return *Database::storedPostVector;
+	}
 }
 
