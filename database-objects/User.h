@@ -10,12 +10,13 @@
 class User
 {
 public:
-  User(int id, std::string username, std::string alias, std::string bio)
+  User(int id, std::string username, std::string alias, std::string bio, std::string password)
   {
 	  this->id = id;
 	  this->username = username;
 	  this->alias = alias;
 	  this->bio = bio;
+	  this->password = password;
   }
 
   int getId() const
@@ -58,11 +59,22 @@ public:
 	  User::bio = bio;
   }
 
+  const std::string& getPassword() const
+  {
+	  return password;
+  }
+
+  void setPassword(const std::string& password)
+  {
+	  User::password = password;
+  }
+
 private:
   int id;
   std::string username;
   std::string alias;
   std::string bio;
+  std::string password;
 };
 
 

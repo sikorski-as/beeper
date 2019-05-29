@@ -18,8 +18,9 @@ static int make_user_callback(void *data, int nr_cols, char **field, char **colN
 	std::string username(field[1]);
 	std::string alias(field[2]);
 	std::string bio(field[3]);
+	std::string password(field[4]);
 
-	Database::storedUser = new User(id, username, alias, bio);
+	Database::storedUser = new User(id, username, alias, bio, password);
 
 	return 0;
 }
@@ -30,8 +31,9 @@ static int add_user_callback(void *data, int nr_cols, char **field, char **colNa
 	std::string username(field[1]);
 	std::string alias(field[2]);
 	std::string bio(field[3]);
+	std::string password(field[4]);
 
-	Database::storedUserVector->push_back(User(id, username, alias, bio));
+	Database::storedUserVector->push_back(User(id, username, alias, bio, password));
 
 	return 0;
 }
@@ -73,11 +75,11 @@ void Database::openDB(std::string fileName)
 	}
 }
 
-void Database::addUser(std::string userName, std::string alias, std::string bio)
+void Database::addUser(std::string userName, std::string alias, std::string bio, std::string password)
 {
 	char* errorMsg = nullptr;
-	std::string query = "insert into users (username, alias, bio) values ('" +
-						userName + "','" + alias + "','" + bio + "');";
+	std::string query = "insert into users (username, alias, bio, password) values ('" +
+						userName + "','" + alias + "','" + bio + "','" + password + "');";
 
 	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
 

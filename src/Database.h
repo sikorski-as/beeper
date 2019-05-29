@@ -24,7 +24,7 @@ public:
 
   void openDB(std::string fileName);
 
-  void addUser(std::string userName, std::string alias, std::string bio);
+  void addUser(std::string userName, std::string alias, std::string bio, std::string password);
 
   void deleteUser(int id);
 
