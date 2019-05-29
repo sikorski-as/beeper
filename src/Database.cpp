@@ -54,7 +54,7 @@ void Database::addUser(std::string userName, std::string alias, std::string bio)
 	}
 	else
 	{
-		std::cout << "User added failurefully" << std::endl;
+		std::cout << "User added successfully" << std::endl;
 	}
 }
 
@@ -72,7 +72,7 @@ void Database::deleteUser(int id)
 	}
 	else
 	{
-		std::cout << "User deleted failurefully" << std::endl;
+		std::cout << "User deleted successfully" << std::endl;
 	}
 }
 
@@ -90,7 +90,7 @@ void Database::changeUserAlias(int id, std::string alias)
 	}
 	else
 	{
-		std::cout << "Alias changed failurefully" << std::endl;
+		std::cout << "Alias changed successfully" << std::endl;
 	}
 }
 
@@ -108,7 +108,7 @@ void Database::changeUserBio(int id, std::string bio)
 	}
 	else
 	{
-		std::cout << "Bio changed failurefully" << std::endl;
+		std::cout << "Bio changed successfully" << std::endl;
 	}
 }
 
@@ -127,7 +127,7 @@ void Database::addPost(int userId, std::string content)
 	}
 	else
 	{
-		std::cout << "Post added failurefully" << std::endl;
+		std::cout << "Post added successfully" << std::endl;
 	}
 }
 
@@ -145,7 +145,7 @@ User Database::getUserById(int id)
 	}
 	else
 	{
-		std::cout << "Post added failurefully" << std::endl;
+		std::cout << "Post added successfully" << std::endl;
 		return *Database::storedUser;
 	}
 }
@@ -157,7 +157,20 @@ User Database::getUserByUsername(std::string username)
 
 void Database::deletePost(int id)
 {
+	char* errorMsg = nullptr;
+	std::string query = "delete from posts where id =" + std::to_string(id) + ";";
 
+	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::cout << "Error while deleting post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
+	else
+	{
+		std::cout << "Post deleted successfully" << std::endl;
+	}
 }
 
 Post Database::getPostById(int id)
