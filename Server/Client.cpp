@@ -4,16 +4,20 @@
 
 typedef void(Client::*event_handling_function)(Event);
 
-static std::map<std::string, event_handling_function> serviceFunctionsMap = {
-		{"LOGIN_REQUEST", &Client::handleLoginRequest},
-		{"LOGOUT_REQUEST", &Client::handleLogoutREquest}
-};
+//static std::map<std::string, event_handling_function> serviceFunctionsMap;
+//
+//static void initFunctionsMap()
+//{
+//	serviceFunctionsMap["LOGIN_REQUEST"] = &Client::handleLoginRequest;
+//	serviceFunctionsMap["LOGOUT_REQUEST"] = &Client::handleLogoutREquest;
+//}
 
 extern Server server;
 
 Client::Client(CommunicationStack* communicationStack)
 : communicationStack(communicationStack), clientThread(&Client::clientThreadTask, this){
     clientThread.detach();
+	//initFunctionsMap();
 }
 
 Client::~Client() {
@@ -40,9 +44,18 @@ void Client::clientThreadTask() {
         try{
             auto e = communicationStack->getEvent();
 
-			serviceFunctionsMap[e["type"]](e);
+			//serviceFunctionsMap[e["type"]](e);
+			if(e["type"] == "LOGIN_REQUEST")
+			{
+				handleLoginRequest(LoginRequest(e));
+			}
+			else if(e["type"] == "LOGOUT_REQUEST")
+			{
+				handleLogoutRequest(LogoutRequest(e));
+			}
 
-            if(serviceFunctionsMap.find(e["type"]) == serviceFunctionsMap.end())
+            //if(serviceFunctionsMap.find(e["type"]) == serviceFunctionsMap.end())
+			else
 			{
                 std::cout << "got unknown request:" << std::endl;
                 std::cout << "\t" << e.dump() << std::endl;
@@ -75,7 +88,7 @@ void Client::handleLoginRequest(LoginRequest request) {
     }
 }
 
-void Client::handleLogoutREquest(LogoutRequest request)
+void Client::handleLogoutRequest(LogoutRequest request)
 {
 	if(user.getUsername() == request.username)
 	{
