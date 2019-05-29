@@ -42,7 +42,7 @@ void Client::clientThreadTask() {
 
 			serviceFunctionsMap[e["type"]](e);
 
-            if()//todo: handle unknown request
+            if(serviceFunctionsMap.find(e["type"]) == serviceFunctionsMap.end())
 			{
                 std::cout << "got unknown request:" << std::endl;
                 std::cout << "\t" << e.dump() << std::endl;
