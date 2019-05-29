@@ -48,14 +48,6 @@ public:
 
   std::vector<Post> getLikedPostsForUser(int userId);
 
-  static void setStoredUser(User* storedUser);
-
-  static void setStoredUserVector(const std::vector<User>& storedUserVector);
-
-  static void setStoredPost(const Post& storedPost);
-
-  static void setStoredPostVector(const std::vector<Post>& storedPostVector);
-
   static User* storedUser;
 
   static std::vector<User>* storedUserVector;
@@ -66,8 +58,6 @@ public:
 
 private:
   sqlite3* database;
-
-
 };
 
 

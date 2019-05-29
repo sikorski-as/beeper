@@ -24,6 +24,17 @@ static int make_user_callback(void *data, int nr_cols, char **field, char **colN
 	return 0;
 }
 
+static int make_post_callback(void* data, int nr_cols, char** field, char** colName)
+{
+	int id = std::stoi(field[0]);
+	int userId = std::stoi(field[1]);
+	std::string content(field[2]);
+
+	Database::storedPost = new Post(id, userId, content);
+
+	return 0;
+}
+
 void Database::openDB(std::string fileName)
 {
 	int failure = sqlite3_open(fileName.c_str(), &database);
@@ -189,7 +200,21 @@ void Database::deletePost(int id)
 
 Post Database::getPostById(int id)
 {
+	char* errorMsg = nullptr;
+	std::string query = "select * from posts where id = " + std::to_string(id) + ";";
 
+	int failure = sqlite3_exec(database, query.c_str(), make_post_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		sqlite3_free(errorMsg);
+	}
+	else
+	{
+		std::cout << "Post added successfully" << std::endl;
+		return *Database::storedPost;
+	}
 }
 
 std::vector<Post> Database::getPostsByUserId(int userId)
@@ -206,24 +231,4 @@ std::vector<Post> Database::getLikedPostsForUser(int userId)
 {
 
 }
-
-//void Database::setStoredUser(User* storedUser)
-//{
-//	Database::storedUser = storedUser;
-//}
-//
-//void Database::setStoredUserVector(const std::vector<User>& storedUserVector)
-//{
-//	Database::storedUserVector = storedUserVector;
-//}
-//
-//void Database::setStoredPost(const Post& storedPost)
-//{
-//	Database::storedPost = storedPost;
-//}
-//
-//void Database::setStoredPostVector(const std::vector<Post>& storedPostVector)
-//{
-//	Database::storedPostVector = storedPostVector;
-//}
 
