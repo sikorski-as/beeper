@@ -24,6 +24,8 @@ public:
 
   void openDB(std::string fileName);
 
+  void closeDB() {sqlite3_close(database);}
+
   void addUser(std::string userName, std::string alias, std::string bio, std::string password);
 
   void deleteUser(int id);
