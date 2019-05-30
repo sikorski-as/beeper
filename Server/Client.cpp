@@ -131,7 +131,7 @@ void Client::handleLoginRequest(LoginRequest request) {
 
     if(temp.getPassword() == request.password){
 
-        user = &temp;
+        user = new User(temp.getId(), temp.getUsername(), temp.getAlias(), temp.getBio(), temp.getPassword());
 
         communicationStack->sendEvent(LoginResponse(true, "<session_token>"));
     }
