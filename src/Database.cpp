@@ -228,7 +228,7 @@ User Database::getUserById(int id)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while adding post: " + error);
+		throw DatabaseException("Error while getting user by id: " + error);
 	}
 	else if(Database::storedUser == nullptr)
 	{
@@ -236,7 +236,7 @@ User Database::getUserById(int id)
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
+		std::cout << "User got successfully" << std::endl;
 		User* temp = Database::storedUser;
 		Database::storedUser = nullptr;
 		return *temp;
@@ -254,7 +254,7 @@ User Database::getUserByUsername(std::string username)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while adding post: " + error);
+		throw DatabaseException("Error while getting user by username: " + error);
 	}
 	else if(Database::storedUser == nullptr)
 	{
@@ -300,7 +300,7 @@ std::vector<Post> Database::getNNewestPosts(int n)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while getting posts: " + error);
+		throw DatabaseException("Error while getting n posts: " + error);
 	}
 	else if(Database::storedPostVector->empty())
 	{
@@ -326,7 +326,7 @@ Post Database::getPostById(int id)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while adding post: " + error);
+		throw DatabaseException("Error while getting post by id: " + error);
 	}
 	else if(Database::storedPost == nullptr)
 	{
@@ -352,7 +352,7 @@ std::vector<Post> Database::getPostsByUserId(int userId)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while adding post: " + error);
+		throw DatabaseException("Error while getting post by user_id: " + error);
 	}
 	else if(Database::storedPostVector->empty())
 	{
@@ -379,7 +379,7 @@ std::vector<User> Database::getLikesForPost(int postId)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while adding post: " + error);
+		throw DatabaseException("Error while getting like for post: " + error);
 	}
 	else if(Database::storedUserVector->empty())
 	{
@@ -406,7 +406,7 @@ std::vector<Post> Database::getLikedPostsForUser(int userId)
 	{
 		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
-		throw DatabaseException("Error while adding post: " + error);
+		throw DatabaseException("Error while getting liked posts for user: " + error);
 	}
 	else if(Database::storedPostVector->empty())
 	{
