@@ -26,6 +26,7 @@ public:
 
     void handleLoginRequest(LoginRequest);
   	void handleLogoutRequest(LogoutRequest);
+  	void handleRegisterRequest(RegisterRequest);
 };
 
 

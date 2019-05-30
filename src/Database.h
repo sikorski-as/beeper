@@ -71,6 +71,8 @@ public:
 
   static std::vector<Post>* storedPostVector;
 
+  static bool containsForbiddenChars(std::string);
+
 private:
   sqlite3* database;
 };

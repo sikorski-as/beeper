@@ -180,7 +180,7 @@ class LogoutResponse
 public:
   bool status;
 
-  LogoutResponse(bool _status, std::string _token){
+  LogoutResponse(bool _status){
       status = _status;
   }
 
@@ -201,6 +201,76 @@ public:
       e["type"] = "LOGOUT_RESPONSE";
       e["status"] = status;
       return e;
+  }
+};
+
+class RegisterRequest
+{
+public:
+  std::string username;
+  std::string password;
+  std::string alias;
+  std::string bio;
+
+  RegisterRequest(std::string username, std::string password, std::string alias, std::string bio){
+	  this->username = username;
+	  this->password = password;
+	  this->alias = alias;
+	  this->bio = bio;
+  }
+
+  explicit RegisterRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "username"})) {
+		  throw EventNotValid("Improper REGISTER_REQUEST");
+	  }
+	  try{
+		  username = e["username"].get<std::string>();
+		  password = e["password"].get<std::string>();
+		  alias = e["alias"].get<std::string>();
+		  bio = e["bio"].get<std::string>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper REGISTER_REQUEST");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "REGISTER_REQUEST";
+	  e["username"] = username;
+	  e["password"] = password;
+	  e["alias"] = alias;
+	  e["bio"] = bio;
+	  return e;
+  }
+};
+
+class RegisterResponse
+{
+public:
+  bool status;
+
+  RegisterResponse(bool _status){
+	  status = _status;
+  }
+
+  explicit RegisterResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper REGISTER_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper REGISTER_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "REGISTER_RESPONSE";
+	  e["status"] = status;
+	  return e;
   }
 };
 

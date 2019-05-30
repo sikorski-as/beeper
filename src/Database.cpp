@@ -288,3 +288,14 @@ std::vector<Post> Database::getLikedPostsForUser(int userId)
 	}
 }
 
+bool Database::containsForbiddenChars(std::string text)
+{
+	if(text.find('\'') == std::string::npos && text.find(';') == std::string::npos && text.find('-') == std::string::npos)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

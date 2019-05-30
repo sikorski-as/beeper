@@ -123,3 +123,19 @@ void Client::handleLogoutRequest(LogoutRequest request)
 		communicationStack->sendEvent(LogoutResponse(false));
 	}
 }
+
+void Client::handleRegisterRequest(RegisterRequest request)
+{
+	if(Database::containsForbiddenChars(request.username) ||
+			Database::containsForbiddenChars(request.password) ||
+			Database::containsForbiddenChars(request.alias) ||
+			Database::containsForbiddenChars(request.bio))
+	{
+		communicationStack->sendEvent(RegisterResponse(false));
+	}
+	else
+	{
+		server.database.addUser(request.username, request.alias, request.bio, request.password);
+		communicationStack->sendEvent(RegisterResponse(true));
+	}
+}
