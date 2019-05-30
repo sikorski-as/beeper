@@ -569,4 +569,65 @@ public:
   }
 };
 
+class GetUserPostsRequest
+{
+public:
+  std::string username;
+
+  GetUserPostsRequest(){
+  }
+
+  explicit GetUserPostsRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "username"})) {
+		  throw EventNotValid("Improper GET_USER_POSTS_REQUEST");
+	  }
+	  try{
+		  username = e["username"].get<std::string>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "GET_USER_POSTS_REQUEST";
+	  e["username"] = username;
+	  return e;
+  }
+};
+
+class GetUserPostsResponse
+{
+public:
+  bool status;
+  json data;
+
+  GetUserPostsResponse(bool _status, json data){
+	  status = _status;
+	  this->data = data;
+  }
+
+  explicit GetUserPostsResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper GET_USER_POSTS_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+		  data = e["data"].get<json>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_USER_POSTS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "GET_USER_POSTS_RESPONSE";
+	  e["status"] = status;
+	  e["data"] = data;
+	  return e;
+  }
+};
+
 #endif //BEEPER_EVENT_H

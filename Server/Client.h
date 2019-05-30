@@ -32,6 +32,7 @@ public:
   	void handleGetNNewPostsRequest(GetNNewPostsRequest);
   	void handleGetAllUsersRequest(GetAllUsersRequest);
   	void handleViewUserRequest(ViewUserRequest);
+  	void handleGetUserPostsRequest(GetUserPostsRequest);
 };
 
 

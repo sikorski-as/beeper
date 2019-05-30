@@ -73,6 +73,14 @@ void Client::clientThreadTask() {
 			{
 				handleGetAllUsersRequest(GetAllUsersRequest(e));
 			}
+			else if(e["type"] == "VIEW_USER_REQUEST")
+			{
+				handleViewUserRequest(ViewUserRequest(e));
+			}
+			else if(e["type"] == "GET_USER_POSTS_REQUEST")
+			{
+				handleGetUserPostsRequest(GetUserPostsRequest(e));
+			}
 			else
 			{
                 std::cout << "got unknown request:" << std::endl;
@@ -252,6 +260,8 @@ void Client::handleGetAllUsersRequest(GetAllUsersRequest request)
 	catch (DatabaseException& e)
 	{
 		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(GetAllUsersResponse(false, ""));
+		return;
 	}
 
 	json j_user;
@@ -288,6 +298,7 @@ void Client::handleViewUserRequest(ViewUserRequest request)
 	{
 		std::cout << e.what() << std::endl;
 		communicationStack->sendEvent(ViewUserResponse(false,""));
+		return;
 	}
 
 	json j_user;
@@ -297,4 +308,40 @@ void Client::handleViewUserRequest(ViewUserRequest request)
 	j_user["bio"] = temp.getBio();
 
 	communicationStack->sendEvent(ViewUserResponse(true, j_user));
+}
+
+void Client::handleGetUserPostsRequest(GetUserPostsRequest request)
+{
+	if(user == nullptr || Database::containsForbiddenChars(request.username))
+	{
+		communicationStack->sendEvent(GetUserPostsResponse(false,""));
+		return;
+	}
+
+	std::vector<Post> posts;
+	User temp;
+
+	try
+	{
+		temp = server.database.getUserByUsername(request.username);
+		posts = server.database.getPostsByUserId(temp.getId());
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(GetUserPostsResponse(false, ""));
+		return;
+	}
+
+	json j_post;
+	json j_array;
+
+	for(auto post: posts)
+	{
+		j_post["id"] = post.getId();
+		j_post["content"] = post.getContent();
+		j_array.push_back(j_post);
+	}
+
+	communicationStack->sendEvent(GetUserPostsResponse(true, j_array));
 }
