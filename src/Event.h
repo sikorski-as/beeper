@@ -402,7 +402,7 @@ public:
   }
 
   explicit GetNNewPostsRequest(Event e){
-	  if(!checkEventKeys(e, {"type", "post_id"})) {
+	  if(!checkEventKeys(e, {"type", "number_of_posts"})) {
 		  throw EventNotValid("Improper GET_N_NEW_POSTS_REQUEST");
 	  }
 	  try{
@@ -434,7 +434,7 @@ public:
   }
 
   explicit GetNNewPostsResponse(Event e){
-	  if(!checkEventKeys(e, {"type", "status"})) {
+	  if(!checkEventKeys(e, {"type", "status", "data"})) {
 		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
 	  }
 	  try{
@@ -487,7 +487,7 @@ public:
   }
 
   explicit GetAllUsersResponse(Event e){
-	  if(!checkEventKeys(e, {"type", "status"})) {
+	  if(!checkEventKeys(e, {"type", "status", "data"})) {
 		  throw EventNotValid("Improper GET_ALL_USERS_RESPONSE");
 	  }
 	  try{
@@ -548,7 +548,7 @@ public:
   }
 
   explicit ViewUserResponse(Event e){
-	  if(!checkEventKeys(e, {"type", "status"})) {
+	  if(!checkEventKeys(e, {"type", "status", "data"})) {
 		  throw EventNotValid("Improper VIEW_USER_RESPONSE");
 	  }
 	  try{
@@ -609,7 +609,7 @@ public:
   }
 
   explicit GetUserPostsResponse(Event e){
-	  if(!checkEventKeys(e, {"type", "status"})) {
+	  if(!checkEventKeys(e, {"type", "status", "data"})) {
 		  throw EventNotValid("Improper GET_USER_POSTS_RESPONSE");
 	  }
 	  try{
@@ -626,6 +626,63 @@ public:
 	  e["type"] = "GET_USER_POSTS_RESPONSE";
 	  e["status"] = status;
 	  e["data"] = data;
+	  return e;
+  }
+};
+
+class DeleteUserRequest
+{
+public:
+  int id;
+
+  DeleteUserRequest(){
+  }
+
+  explicit DeleteUserRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "id"})) {
+		  throw EventNotValid("Improper DELETE_USER_REQUEST");
+	  }
+	  try{
+		  id = e["id"].get<int>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "DELETE_USER_REQUEST";
+	  e["id"] = id;
+	  return e;
+  }
+};
+
+class DeleteUserResponse
+{
+public:
+  bool status;
+
+  DeleteUserResponse(bool _status){
+	  status = _status;
+  }
+
+  explicit DeleteUserResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper DELETE_USER_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper DELETE_USER_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "DELETE_USER_RESPONSE";
+	  e["status"] = status;
 	  return e;
   }
 };

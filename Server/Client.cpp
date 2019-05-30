@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Client.h"
 #include "Server.h"
+#include "../src/Event.h"
 
 typedef void(Client::*event_handling_function)(Event);
 
@@ -80,6 +81,10 @@ void Client::clientThreadTask() {
 			else if(e["type"] == "GET_USER_POSTS_REQUEST")
 			{
 				handleGetUserPostsRequest(GetUserPostsRequest(e));
+			}
+			else if(e["type"] == "DELETE_USER_REQUEST")
+			{
+				handleDeleteUserRequest(DeleteUserRequest(e));
 			}
 			else
 			{
@@ -344,4 +349,26 @@ void Client::handleGetUserPostsRequest(GetUserPostsRequest request)
 	}
 
 	communicationStack->sendEvent(GetUserPostsResponse(true, j_array));
+}
+
+void Client::handleDeleteUserRequest(DeleteUserRequest request)
+{
+	if(user == nullptr)
+	{
+		communicationStack->sendEvent(DeleteUserResponse(false));
+		return;
+	}
+
+	try
+	{
+		server.database.deleteUser(request.id);
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(DeleteUserResponse(false));
+		return;
+	}
+
+	communicationStack->sendEvent(DeleteUserResponse(false));
 }

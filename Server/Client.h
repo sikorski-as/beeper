@@ -33,6 +33,7 @@ public:
   	void handleGetAllUsersRequest(GetAllUsersRequest);
   	void handleViewUserRequest(ViewUserRequest);
   	void handleGetUserPostsRequest(GetUserPostsRequest);
+  	void handleDeleteUserRequest(DeleteUserRequest);
 };
 
 
