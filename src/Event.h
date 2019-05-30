@@ -392,4 +392,63 @@ public:
   }
 };
 
+class GetNNewPostsRequest
+{
+public:
+  int postId;
+
+  GetNNewPostsRequest(int postId){
+	  this->postId = postId;
+  }
+
+  explicit GetNNewPostsRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "post_id"})) {
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_REQUEST");
+	  }
+	  try{
+		  postId = e["post_id"].get<int>();
+
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_REQUEST");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "GET_N_NEW_POSTS_REQUEST";
+	  e["post_id"] = postId;
+	  return e;
+  }
+};
+
+class GetNNewPostsResponse
+{
+public:
+  bool status;
+
+  GetNNewPostsResponse(bool _status){
+	  status = _status;
+  }
+
+  explicit GetNNewPostsResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "GET_N_NEW_POSTS_RESPONSE";
+	  e["status"] = status;
+	  return e;
+  }
+};
+
 #endif //BEEPER_EVENT_H
