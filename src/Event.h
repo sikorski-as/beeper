@@ -274,4 +274,63 @@ public:
   }
 };
 
+class AddPostRequest
+{
+public:
+  std::string content;
+
+  AddPostRequest(std::string content){
+	  this->content = content;
+  }
+
+  explicit AddPostRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "username"})) {
+		  throw EventNotValid("Improper ADD_POST_REQUEST");
+	  }
+	  try{
+		  content = e["content"].get<std::string>();
+
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper ADD_POST_REQUEST");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "ADD_POST_REQUEST";
+	  e["content"] = content;
+	  return e;
+  }
+};
+
+class AddPostResponse
+{
+public:
+  bool status;
+
+  AddPostResponse(bool _status){
+	  status = _status;
+  }
+
+  explicit AddPostResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper ADD_POST_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper ADD_POST_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "ADD_POST_RESPONSE";
+	  e["status"] = status;
+	  return e;
+  }
+};
+
 #endif //BEEPER_EVENT_H

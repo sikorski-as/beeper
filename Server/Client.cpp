@@ -53,8 +53,14 @@ void Client::clientThreadTask() {
 			{
 				handleLogoutRequest(LogoutRequest(e));
 			}
-
-            //if(serviceFunctionsMap.find(e["type"]) == serviceFunctionsMap.end())
+			else if(e["type"] == "REGISTER_REQUEST")
+			{
+				handleRegisterRequest(RegisterRequest(e));
+			}
+			else if(e["type"] == "ADD_POST_REQUEST")
+			{
+				handleAddPostRequest(AddPostRequest(e));
+			}
 			else
 			{
                 std::cout << "got unknown request:" << std::endl;
@@ -137,5 +143,24 @@ void Client::handleRegisterRequest(RegisterRequest request)
 	{
 		server.database.addUser(request.username, request.alias, request.bio, request.password);
 		communicationStack->sendEvent(RegisterResponse(true));
+	}
+}
+
+void Client::handleAddPostRequest(AddPostRequest request)
+{
+	if(user == nullptr)
+	{
+		communicationStack->sendEvent(AddPostResponse(false));
+		return;
+	}
+
+	if(Database::containsForbiddenChars(request.content))
+	{
+		communicationStack->sendEvent(AddPostResponse(false));
+	}
+	else
+	{
+		server.database.addPost(user->getId(), request.content);
+		communicationStack->sendEvent(AddPostResponse(true));
 	}
 }
