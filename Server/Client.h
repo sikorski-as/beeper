@@ -34,6 +34,7 @@ public:
   	void handleViewUserRequest(ViewUserRequest);
   	void handleGetUserPostsRequest(GetUserPostsRequest);
   	void handleDeleteUserRequest(DeleteUserRequest);
+  	void handleDeletePostRequest(DeletePostRequest);
 };
 
 

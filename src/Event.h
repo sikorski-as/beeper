@@ -687,4 +687,61 @@ public:
   }
 };
 
+class DeletePostRequest
+{
+public:
+  int id;
+
+  DeletePostRequest(){
+  }
+
+  explicit DeletePostRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "id"})) {
+		  throw EventNotValid("Improper DELETE_POST_REQUEST");
+	  }
+	  try{
+		  id = e["id"].get<int>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "DELETE_POST_REQUEST";
+	  e["id"] = id;
+	  return e;
+  }
+};
+
+class DeletePostResponse
+{
+public:
+  bool status;
+
+  DeletePostResponse(bool _status){
+	  status = _status;
+  }
+
+  explicit DeletePostResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper DELETE_POST_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper DELETE_POST_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "DELETE_POST_RESPONSE";
+	  e["status"] = status;
+	  return e;
+  }
+};
+
 #endif //BEEPER_EVENT_H

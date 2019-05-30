@@ -86,6 +86,10 @@ void Client::clientThreadTask() {
 			{
 				handleDeleteUserRequest(DeleteUserRequest(e));
 			}
+			else if(e["type"] == "DELETE_POST_REQUEST")
+			{
+				handleDeletePostRequest(DeletePostRequest(e));
+			}
 			else
 			{
                 std::cout << "got unknown request:" << std::endl;
@@ -371,4 +375,26 @@ void Client::handleDeleteUserRequest(DeleteUserRequest request)
 	}
 
 	communicationStack->sendEvent(DeleteUserResponse(false));
+}
+
+void Client::handleDeletePostRequest(DeletePostRequest request)
+{
+	if(user == nullptr)
+	{
+		communicationStack->sendEvent(DeletePostResponse(false));
+		return;
+	}
+
+	try
+	{
+		server.database.deletePost(request.id);
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(DeletePostResponse(false));
+		return;
+	}
+
+	communicationStack->sendEvent(DeletePostResponse(true));
 }
