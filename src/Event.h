@@ -455,4 +455,57 @@ public:
   }
 };
 
+class GetAllUsersRequest
+{
+public:
+
+  GetAllUsersRequest(){
+  }
+
+  explicit GetAllUsersRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "post_id"})) {
+		  throw EventNotValid("Improper GET_ALL_USERS_REQUEST");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "GET_ALL_USERS_REQUEST";
+	  return e;
+  }
+};
+
+class GetAllUsersResponse
+{
+public:
+  bool status;
+  json data;
+
+  GetAllUsersResponse(bool _status, json data){
+	  status = _status;
+	  this->data = data;
+  }
+
+  explicit GetAllUsersResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper GET_ALL_USERS_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+		  data = e["data"].get<std::string>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_ALL_USERS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "GET_ALL_USERS_RESPONSE";
+	  e["status"] = status;
+	  e["data"] = data;
+	  return e;
+  }
+};
+
 #endif //BEEPER_EVENT_H

@@ -51,6 +51,8 @@ public:
 
   User getUserByUsername(std::string username);
 
+  std::vector<User> getAllUsers();
+
   void addPost(int userId, std::string content);
 
   void likePost(int userId, int postId);

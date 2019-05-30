@@ -143,6 +143,24 @@ void Database::changeUserBio(int id, std::string bio)
 	}
 }
 
+std::vector<User> Database::getAllUsers()
+{
+	char* errorMsg = nullptr;
+	std::string query = "select * from users;";
+
+	int failure = sqlite3_exec(database, query.c_str(), add_user_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		throw DatabaseException("Error while getting users: " + std::string(errorMsg));
+	}
+	else
+	{
+		std::cout << "Users got successfully" << std::endl;
+		return *Database::storedUserVector;
+	}
+}
+
 void Database::addPost(int userId, std::string content)
 {
 	char* errorMsg = nullptr;

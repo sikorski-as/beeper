@@ -69,6 +69,10 @@ void Client::clientThreadTask() {
 			{
 				handleGetNNewPostsRequest(GetNNewPostsRequest(e));
 			}
+			else if(e["type"] == "GET_ALL_USERS_REQUEST")
+			{
+				handleGetAllUsersRequest(GetAllUsersRequest(e));
+			}
 			else
 			{
                 std::cout << "got unknown request:" << std::endl;
@@ -218,16 +222,50 @@ void Client::handleGetNNewPostsRequest(GetNNewPostsRequest request)
 		return;
 	}
 
-	std::vector<std::string> postsData;
-	std::string data;
+	json j_array;
+	json j_post;
 
 	for(auto post: posts)
 	{
-		data = std::to_string(post.getId()) + ":" + post.getContent();
-		postsData.push_back(data);
+		j_post["id"] = std::to_string(post.getId());
+		j_post["content"] = post.getContent();
+		j_array.push_back(j_post);
 	}
 
-	json j_vec(data);
+	communicationStack->sendEvent(GetNNewPostsResponse(true, j_array));
+}
 
-	communicationStack->sendEvent(GetNNewPostsResponse(true, j_vec));
+void Client::handleGetAllUsersRequest(GetAllUsersRequest request)
+{
+	if(user == nullptr)
+	{
+		communicationStack->sendEvent(GetAllUsersResponse(false, ""));
+		return;
+	}
+
+	std::vector<User> users;
+
+	try
+	{
+		users = server.database.getAllUsers();
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+
+	json j_user;
+	json j_array;
+
+	for(auto usr: users)
+	{
+		j_user["id"] = usr.getId();
+		j_user["username"] = usr.getUsername();
+		j_user["password"] = usr.getPassword();
+		j_user["alias"] = usr.getAlias();
+		j_user["bio"] = usr.getBio();
+		j_array.push_back(j_user);
+	}
+
+	communicationStack->sendEvent(GetAllUsersResponse(true, j_array));
 }
