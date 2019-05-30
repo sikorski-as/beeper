@@ -61,7 +61,7 @@ public:
 
   Post getPostById(int id);
 
-  std::vector<Post> getNNewsestPosts(int n);
+  std::vector<Post> getNNewestPosts(int n);
 
   std::vector<Post> getPostsByUserId(int userId);
 

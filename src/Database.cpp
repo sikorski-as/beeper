@@ -84,7 +84,9 @@ void Database::addUser(std::string userName, std::string alias, std::string bio,
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding user: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding user: " + error);
 	}
 	else
 	{
@@ -101,7 +103,9 @@ void Database::deleteUser(int id)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while deleting user: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while deleting user: " + error);
 	}
 	else
 	{
@@ -118,7 +122,9 @@ void Database::changeUserAlias(int id, std::string alias)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while changing alias: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while changing alias: " + error);
 	}
 	else
 	{
@@ -135,7 +141,9 @@ void Database::changeUserBio(int id, std::string bio)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while changing bio: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while changing bio: " + error);
 	}
 	else
 	{
@@ -152,12 +160,20 @@ std::vector<User> Database::getAllUsers()
 
 	if(failure)
 	{
-		throw DatabaseException("Error while getting users: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting users: " + error);
+	}
+	else if(Database::storedUserVector->empty())
+	{
+		throw DatabaseException("No users found");
 	}
 	else
 	{
 		std::cout << "Users got successfully" << std::endl;
-		return *Database::storedUserVector;
+		std::vector<User>* temp = Database::storedUserVector;
+		Database::storedUserVector->clear();
+		return *temp;
 	}
 }
 
@@ -171,7 +187,9 @@ void Database::addPost(int userId, std::string content)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
 	}
 	else
 	{
@@ -189,7 +207,9 @@ void Database::likePost(int userId, int postId)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding like: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding like: " + error);
 	}
 	else
 	{
@@ -206,12 +226,20 @@ User Database::getUserById(int id)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
+	}
+	else if(Database::storedUser == nullptr)
+	{
+		throw DatabaseException("User not found");
 	}
 	else
 	{
 		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedUser;
+		User* temp = Database::storedUser;
+		Database::storedUser = nullptr;
+		return *temp;
 	}
 }
 
@@ -224,12 +252,20 @@ User Database::getUserByUsername(std::string username)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
+	}
+	else if(Database::storedUser == nullptr)
+	{
+		throw DatabaseException("User not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedUser;
+		std::cout << "Got user successfully" << std::endl;
+		User* temp = Database::storedUser;
+		Database::storedUser = nullptr;
+		return *temp;
 	}
 }
 
@@ -242,7 +278,9 @@ void Database::deletePost(int id)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while deleting post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while deleting post: " + error);
 	}
 	else
 	{
@@ -250,7 +288,7 @@ void Database::deletePost(int id)
 	}
 }
 
-std::vector<Post> Database::getNNewsestPosts(int n)
+std::vector<Post> Database::getNNewestPosts(int n)
 {
 	char* errorMsg = nullptr;
 	std::string query = "select * from (select * from posts order by posts.id desc limit " + std::to_string(n)
@@ -260,12 +298,20 @@ std::vector<Post> Database::getNNewsestPosts(int n)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while getting posts: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting posts: " + error);
+	}
+	else if(Database::storedPostVector->empty())
+	{
+		throw DatabaseException("No posts found");
 	}
 	else
 	{
 		std::cout << "Posts got successfully" << std::endl;
-		return *Database::storedPostVector;
+		std::vector<Post>* temp = Database::storedPostVector;
+		Database::storedPostVector = new std::vector<Post>();
+		return *temp;
 	}
 }
 
@@ -278,12 +324,20 @@ Post Database::getPostById(int id)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
+	}
+	else if(Database::storedPost == nullptr)
+	{
+		throw DatabaseException("Post not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedPost;
+		std::cout << "Post got successfully" << std::endl;
+		Post* temp = Database::storedPost;
+		Database::storedPost = nullptr;
+		return *temp;
 	}
 }
 
@@ -296,12 +350,20 @@ std::vector<Post> Database::getPostsByUserId(int userId)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
+	}
+	else if(Database::storedPostVector->empty())
+	{
+		throw DatabaseException("Posts not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedPostVector;
+		std::cout << "Posts got successfully" << std::endl;
+		std::vector<Post>* temp = Database::storedPostVector;
+		Database::storedPostVector = new std::vector<Post>();
+		return *temp;
 	}
 }
 
@@ -315,12 +377,20 @@ std::vector<User> Database::getLikesForPost(int postId)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
+	}
+	else if(Database::storedUserVector->empty())
+	{
+		throw DatabaseException("Likes not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedUserVector;
+		std::cout << "Likes got successfully" << std::endl;
+		std::vector<User>* temp = Database::storedUserVector;
+		Database::storedUserVector = new std::vector<User>;
+		return *temp;
 	}
 }
 
@@ -334,12 +404,20 @@ std::vector<Post> Database::getLikedPostsForUser(int userId)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
+	}
+	else if(Database::storedPostVector->empty())
+	{
+		throw DatabaseException("Liked posts not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedPostVector;
+		std::cout << "Liked posts got successfully" << std::endl;
+		std::vector<Post>* temp = Database::storedPostVector;
+		Database::storedPostVector = new std::vector<Post>();
+		return *temp;
 	}
 }
 

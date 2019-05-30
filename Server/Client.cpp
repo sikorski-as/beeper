@@ -226,7 +226,7 @@ void Client::handleGetNNewPostsRequest(GetNNewPostsRequest request)
 
 	try
 	{
-		posts = server.database.getNNewsestPosts(request.numberOfPosts);
+		posts = server.database.getNNewestPosts(request.numberOfPosts);
 	}
 	catch (DatabaseException& e)
 	{
