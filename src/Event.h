@@ -395,10 +395,10 @@ public:
 class GetNNewPostsRequest
 {
 public:
-  int postId;
+  int numberOfPosts;
 
-  GetNNewPostsRequest(int postId){
-	  this->postId = postId;
+  GetNNewPostsRequest(int number){
+	  this->numberOfPosts = number;
   }
 
   explicit GetNNewPostsRequest(Event e){
@@ -406,7 +406,7 @@ public:
 		  throw EventNotValid("Improper GET_N_NEW_POSTS_REQUEST");
 	  }
 	  try{
-		  postId = e["post_id"].get<int>();
+		  numberOfPosts = e["number_of_posts"].get<int>();
 
 	  }
 	  catch(...){
@@ -417,7 +417,7 @@ public:
   operator Event(){
 	  Event e;
 	  e["type"] = "GET_N_NEW_POSTS_REQUEST";
-	  e["post_id"] = postId;
+	  e["number_of_posts"] = numberOfPosts;
 	  return e;
   }
 };
@@ -426,9 +426,11 @@ class GetNNewPostsResponse
 {
 public:
   bool status;
+  json data;
 
-  GetNNewPostsResponse(bool _status){
+  GetNNewPostsResponse(bool _status, json data){
 	  status = _status;
+	  this->data = data;
   }
 
   explicit GetNNewPostsResponse(Event e){
@@ -437,6 +439,7 @@ public:
 	  }
 	  try{
 		  status = e["status"].get<bool>();
+		  data = e["data"].get<std::string>();
 	  }
 	  catch(...){
 		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
@@ -447,6 +450,7 @@ public:
 	  Event e;
 	  e["type"] = "GET_N_NEW_POSTS_RESPONSE";
 	  e["status"] = status;
+	  e["data"] = data;
 	  return e;
   }
 };

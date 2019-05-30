@@ -232,6 +232,25 @@ void Database::deletePost(int id)
 	}
 }
 
+std::vector<Post> Database::getNNewsestPosts(int n)
+{
+	char* errorMsg = nullptr;
+	std::string query = "select * from (select * from posts order by posts.id desc limit " + std::to_string(n)
+						+ " ) order by posts.id asc;";
+
+	int failure = sqlite3_exec(database, query.c_str(), add_post_callback, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		throw DatabaseException("Error while getting posts: " + std::string(errorMsg));
+	}
+	else
+	{
+		std::cout << "Posts got successfully" << std::endl;
+		return *Database::storedPostVector;
+	}
+}
+
 Post Database::getPostById(int id)
 {
 	char* errorMsg = nullptr;

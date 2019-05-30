@@ -65,6 +65,10 @@ void Client::clientThreadTask() {
 			{
 				handleLikePostRequest(LikePostRequest(e));
 			}
+			else if(e["type"] == "GET_N_NEW_POSTS_REQUEST")
+			{
+				handleGetNNewPostsRequest(GetNNewPostsRequest(e));
+			}
 			else
 			{
                 std::cout << "got unknown request:" << std::endl;
@@ -191,4 +195,39 @@ void Client::handleLikePostRequest(LikePostRequest request)
 
 	server.database.likePost(user->getId(), request.postId);
 	communicationStack->sendEvent(LikePostResponse(true));
+}
+
+void Client::handleGetNNewPostsRequest(GetNNewPostsRequest request)
+{
+	if(user == nullptr)
+	{
+		communicationStack->sendEvent(GetNNewPostsResponse(false, ""));
+		return;
+	}
+
+	std::vector<Post> posts;
+
+	try
+	{
+		posts = server.database.getNNewsestPosts(request.numberOfPosts);
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(GetNNewPostsResponse(false, ""));
+		return;
+	}
+
+	std::vector<std::string> postsData;
+	std::string data;
+
+	for(auto post: posts)
+	{
+		data = std::to_string(post.getId()) + ":" + post.getContent();
+		postsData.push_back(data);
+	}
+
+	json j_vec(data);
+
+	communicationStack->sendEvent(GetNNewPostsResponse(true, j_vec));
 }

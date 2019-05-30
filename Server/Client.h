@@ -29,6 +29,7 @@ public:
   	void handleRegisterRequest(RegisterRequest);
   	void handleAddPostRequest(AddPostRequest);
   	void handleLikePostRequest(LikePostRequest);
+  	void handleGetNNewPostsRequest(GetNNewPostsRequest);
 };
 
 
