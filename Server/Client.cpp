@@ -269,3 +269,32 @@ void Client::handleGetAllUsersRequest(GetAllUsersRequest request)
 
 	communicationStack->sendEvent(GetAllUsersResponse(true, j_array));
 }
+
+void Client::handleViewUserRequest(ViewUserRequest request)
+{
+	if(user == nullptr || Database::containsForbiddenChars(request.username))
+	{
+		communicationStack->sendEvent(ViewUserResponse(false,""));
+		return;
+	}
+
+	User temp;
+
+	try
+	{
+		temp = server.database.getUserByUsername(request.username);
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(ViewUserResponse(false,""));
+	}
+
+	json j_user;
+	j_user["id"] = temp.getId();
+	j_user["username"] = temp.getUsername();
+	j_user["alias"] = temp.getAlias();
+	j_user["bio"] = temp.getBio();
+
+	communicationStack->sendEvent(ViewUserResponse(true, j_user));
+}

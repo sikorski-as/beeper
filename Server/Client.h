@@ -31,6 +31,7 @@ public:
   	void handleLikePostRequest(LikePostRequest);
   	void handleGetNNewPostsRequest(GetNNewPostsRequest);
   	void handleGetAllUsersRequest(GetAllUsersRequest);
+  	void handleViewUserRequest(ViewUserRequest);
 };
 
 

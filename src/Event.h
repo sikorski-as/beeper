@@ -439,7 +439,7 @@ public:
 	  }
 	  try{
 		  status = e["status"].get<bool>();
-		  data = e["data"].get<std::string>();
+		  data = e["data"].get<json>();
 	  }
 	  catch(...){
 		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
@@ -463,7 +463,7 @@ public:
   }
 
   explicit GetAllUsersRequest(Event e){
-	  if(!checkEventKeys(e, {"type", "post_id"})) {
+	  if(!checkEventKeys(e, {"type"})) {
 		  throw EventNotValid("Improper GET_ALL_USERS_REQUEST");
 	  }
   }
@@ -492,7 +492,7 @@ public:
 	  }
 	  try{
 		  status = e["status"].get<bool>();
-		  data = e["data"].get<std::string>();
+		  data = e["data"].get<json>();
 	  }
 	  catch(...){
 		  throw EventNotValid("Improper GET_ALL_USERS_RESPONSE");
@@ -502,6 +502,67 @@ public:
   operator Event(){
 	  Event e;
 	  e["type"] = "GET_ALL_USERS_RESPONSE";
+	  e["status"] = status;
+	  e["data"] = data;
+	  return e;
+  }
+};
+
+class ViewUserRequest
+{
+public:
+  std::string username;
+
+  ViewUserRequest(){
+  }
+
+  explicit ViewUserRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "username"})) {
+		  throw EventNotValid("Improper VIEW_USER_REQUEST");
+	  }
+	  try{
+		  username = e["username"].get<std::string>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "VIEW_USER_REQUEST";
+	  e["username"] = username;
+	  return e;
+  }
+};
+
+class ViewUserResponse
+{
+public:
+  bool status;
+  json data;
+
+  ViewUserResponse(bool _status, json data){
+	  status = _status;
+	  this->data = data;
+  }
+
+  explicit ViewUserResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper VIEW_USER_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+		  data = e["data"].get<json>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper VIEW_USER_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "VIEW_USER_RESPONSE";
 	  e["status"] = status;
 	  e["data"] = data;
 	  return e;
