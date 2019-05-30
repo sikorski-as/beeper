@@ -53,6 +53,8 @@ public:
 
   void addPost(int userId, std::string content);
 
+  void likePost(int userId, int postId);
+
   void deletePost(int id);
 
   Post getPostById(int id);

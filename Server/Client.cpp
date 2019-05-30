@@ -61,6 +61,10 @@ void Client::clientThreadTask() {
 			{
 				handleAddPostRequest(AddPostRequest(e));
 			}
+			else if(e["type"] == "LIKE_POST_REQUEST")
+			{
+				handleLikePostRequest(LikePostRequest(e));
+			}
 			else
 			{
                 std::cout << "got unknown request:" << std::endl;
@@ -97,6 +101,7 @@ void Client::handleLoginRequest(LoginRequest request) {
 	{
 		std::cout << exception.what() << std::endl;
 		communicationStack->sendEvent(LoginResponse(false, ""));
+		return;
 	}
 
     if(temp.getPassword() == request.password){
@@ -163,4 +168,27 @@ void Client::handleAddPostRequest(AddPostRequest request)
 		server.database.addPost(user->getId(), request.content);
 		communicationStack->sendEvent(AddPostResponse(true));
 	}
+}
+
+void Client::handleLikePostRequest(LikePostRequest request)
+{
+	if(user == nullptr)
+	{
+		communicationStack->sendEvent(LikePostResponse(false));
+		return;
+	}
+
+	try
+	{
+		server.database.getPostById(request.postId);
+	}
+	catch (DatabaseException& e)
+	{
+		std::cout << e.what() << std::endl;
+		communicationStack->sendEvent(LikePostResponse(false));
+		return;
+	}
+
+	server.database.likePost(user->getId(), request.postId);
+	communicationStack->sendEvent(LikePostResponse(true));
 }

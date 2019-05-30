@@ -161,6 +161,24 @@ void Database::addPost(int userId, std::string content)
 	}
 }
 
+void Database::likePost(int userId, int postId)
+{
+	char* errorMsg = nullptr;
+	std::string query = "insert into likes (user_id, post_id) values (" +
+						std::to_string(userId) + ",'" + std::to_string(postId) + "');";
+
+	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		throw DatabaseException("Error while adding like: " + std::string(errorMsg));
+	}
+	else
+	{
+		std::cout << "Post liked successfully" << std::endl;
+	}
+}
+
 User Database::getUserById(int id)
 {
 	char* errorMsg = nullptr;

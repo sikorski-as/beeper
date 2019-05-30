@@ -220,7 +220,7 @@ public:
   }
 
   explicit RegisterRequest(Event e){
-	  if(!checkEventKeys(e, {"type", "username"})) {
+	  if(!checkEventKeys(e, {"type", "username", "password", "alias", "bio"})) {
 		  throw EventNotValid("Improper REGISTER_REQUEST");
 	  }
 	  try{
@@ -284,7 +284,7 @@ public:
   }
 
   explicit AddPostRequest(Event e){
-	  if(!checkEventKeys(e, {"type", "username"})) {
+	  if(!checkEventKeys(e, {"type", "content"})) {
 		  throw EventNotValid("Improper ADD_POST_REQUEST");
 	  }
 	  try{
@@ -328,6 +328,65 @@ public:
   operator Event(){
 	  Event e;
 	  e["type"] = "ADD_POST_RESPONSE";
+	  e["status"] = status;
+	  return e;
+  }
+};
+
+class LikePostRequest
+{
+public:
+  int postId;
+
+  LikePostRequest(int postId){
+	  this->postId = postId;
+  }
+
+  explicit LikePostRequest(Event e){
+	  if(!checkEventKeys(e, {"type", "post_id"})) {
+		  throw EventNotValid("Improper LIKE_POST_REQUEST");
+	  }
+	  try{
+		  postId = e["post_id"].get<int>();
+
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper LIKE_POST_REQUEST");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "LIKE_POST_REQUEST";
+	  e["post_id"] = postId;
+	  return e;
+  }
+};
+
+class LikePostResponse
+{
+public:
+  bool status;
+
+  LikePostResponse(bool _status){
+	  status = _status;
+  }
+
+  explicit LikePostResponse(Event e){
+	  if(!checkEventKeys(e, {"type", "status"})) {
+		  throw EventNotValid("Improper LIKE_POST_RESPONSE");
+	  }
+	  try{
+		  status = e["status"].get<bool>();
+	  }
+	  catch(...){
+		  throw EventNotValid("Improper LIKE_POST_RESPONSE");
+	  }
+  }
+
+  operator Event(){
+	  Event e;
+	  e["type"] = "LIKE_POST_RESPONSE";
 	  e["status"] = status;
 	  return e;
   }

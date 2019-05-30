@@ -28,6 +28,7 @@ public:
   	void handleLogoutRequest(LogoutRequest);
   	void handleRegisterRequest(RegisterRequest);
   	void handleAddPostRequest(AddPostRequest);
+  	void handleLikePostRequest(LikePostRequest);
 };
 
 
