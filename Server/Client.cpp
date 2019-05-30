@@ -25,7 +25,7 @@ Client::~Client() {
 }
 
 std::string Client::getUsername(){
-    return user.getUsername();
+    return user->getUsername();
 }
 
 void Client::notifyRead() {
@@ -75,11 +75,27 @@ void Client::clientThreadTask() {
 }
 
 void Client::handleLoginRequest(LoginRequest request) {
-	User temp = server.database.getUserByUsername(request.username);
+	User temp;
+
+	if(user != nullptr)
+	{
+		communicationStack->sendEvent(LoginResponse(false, ""));
+		return;
+	}
+
+	try
+	{
+		temp = server.database.getUserByUsername(request.username);
+	}
+	catch(DatabaseException& exception)
+	{
+		std::cout << exception.what() << std::endl;
+		communicationStack->sendEvent(LoginResponse(false, ""));
+	}
 
     if(temp.getPassword() == request.password){
 
-        user = temp;
+        user = &temp;
 
         communicationStack->sendEvent(LoginResponse(true, "<session_token>"));
     }
@@ -90,10 +106,17 @@ void Client::handleLoginRequest(LoginRequest request) {
 
 void Client::handleLogoutRequest(LogoutRequest request)
 {
-	if(user.getUsername() == request.username)
+	if(user == nullptr)
 	{
+		communicationStack->sendEvent(LogoutResponse(false));
+		return;
+	}
+
+	if(user->getUsername() == request.username)
+	{
+		delete user;
+		user = nullptr;
 		communicationStack->sendEvent(LogoutResponse(true));
-		server.clientMonitor.removeClient(this);
 	}
 	else
 	{

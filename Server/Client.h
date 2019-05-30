@@ -11,7 +11,7 @@
 #include "../src/Database.h"
 
 class Client : public IONotifiable{
-    User user;
+    User* user;
     CommunicationStack * communicationStack;
 
     std::thread clientThread;

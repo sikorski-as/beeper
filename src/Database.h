@@ -12,6 +12,19 @@
 #include <iostream>
 #include <vector>
 
+class DatabaseException: public std::exception
+{
+public:
+  std::string reason;
+
+  explicit DatabaseException(std::string reason): reason(reason) {}
+
+  virtual const char* what()
+  {
+	  return reason.c_str();
+  }
+};
+
 class Database
 {
 public:

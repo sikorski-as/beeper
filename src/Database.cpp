@@ -66,8 +66,7 @@ void Database::openDB(std::string fileName)
 
 	if(failure)
 	{
-		std::cout << "Error while opening database: " + sqlite3_errcode(database) << std::endl;
-		exit(EXIT_FAILURE);
+		throw DatabaseException("Error while opening database: " + sqlite3_errcode(database));
 	}
 	else
 	{
@@ -85,8 +84,7 @@ void Database::addUser(std::string userName, std::string alias, std::string bio,
 
 	if(failure)
 	{
-		std::cout << "Error while adding user: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding user: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -103,8 +101,7 @@ void Database::deleteUser(int id)
 
 	if(failure)
 	{
-		std::cout << "Error while deleting user: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while deleting user: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -121,8 +118,7 @@ void Database::changeUserAlias(int id, std::string alias)
 
 	if(failure)
 	{
-		std::cout << "Error while changing alias: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while changing alias: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -139,8 +135,7 @@ void Database::changeUserBio(int id, std::string bio)
 
 	if(failure)
 	{
-		std::cout << "Error while changing bio: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while changing bio: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -158,8 +153,7 @@ void Database::addPost(int userId, std::string content)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -176,8 +170,7 @@ User Database::getUserById(int id)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -195,8 +188,7 @@ User Database::getUserByUsername(std::string username)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -214,8 +206,7 @@ void Database::deletePost(int id)
 
 	if(failure)
 	{
-		std::cout << "Error while deleting post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while deleting post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -232,8 +223,7 @@ Post Database::getPostById(int id)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -251,8 +241,7 @@ std::vector<Post> Database::getPostsByUserId(int userId)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -271,8 +260,7 @@ std::vector<User> Database::getLikesForPost(int postId)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
@@ -291,8 +279,7 @@ std::vector<Post> Database::getLikedPostsForUser(int userId)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
-		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + std::string(errorMsg));
 	}
 	else
 	{
