@@ -69,14 +69,6 @@ public:
 
   std::vector<Post> getLikedPostsForUser(int userId);
 
-  static User* storedUser;
-
-  static std::vector<User>* storedUserVector;
-
-  static Post* storedPost;
-
-  static std::vector<Post>* storedPostVector;
-
   static bool containsForbiddenChars(std::string);
 
 private:

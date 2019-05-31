@@ -13,6 +13,11 @@ public:
   Post(int id, int userId, const std::string& content) : id(id), userId(userId), content(content)
   {}
 
+  Post(): userId(), content()
+  {
+	  id = 0;
+  }
+
   int getId() const
   {
 	  return id;
@@ -41,6 +46,11 @@ public:
   void setContent(const std::string& content)
   {
 	  Post::content = content;
+  }
+
+  bool isEmpty()
+  {
+	  return id == 0;
   }
 
 private:

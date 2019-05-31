@@ -45,6 +45,8 @@ void Client::clientThreadTask() {
         try{
             auto e = communicationStack->getEvent();
 
+			std::cout << "Got request: " << e["type"] << std::endl;
+
 			//serviceFunctionsMap[e["type"]](e);
 			if(e["type"] == "LOGIN_REQUEST")
 			{
@@ -101,6 +103,10 @@ void Client::clientThreadTask() {
             std::cout << "request not valid" << std::endl;
             communicationStack->sendEvent(MalformedRequest(e.reason));
         }
+		catch (std::exception e)
+		{
+			std::cout << "Test exception: " << e.what() << std::endl;
+		}
         catch (...){
             std::cout << "unforeseen service error" << std::endl;
         }

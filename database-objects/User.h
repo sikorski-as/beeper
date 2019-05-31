@@ -19,7 +19,19 @@ public:
 	  this->password = password;
   }
 
-  User() = default;
+  User(const User& other)
+  {
+	  this->id = other.id;
+	  this->username = other.username;
+	  this->alias = other.alias;
+	  this->bio = other.bio;
+	  this->password = other.password;
+  }
+
+  User(): username(), alias(), bio(), password()
+  {
+	  id = 0;
+  }
 
   int getId() const
   {
@@ -69,6 +81,11 @@ public:
   void setPassword(const std::string& password)
   {
 	  User::password = password;
+  }
+
+  bool isEmpty()
+  {
+	  return id == 0;
   }
 
 private:
