@@ -380,7 +380,7 @@ void Client::handleDeleteUserRequest(DeleteUserRequest request)
 		return;
 	}
 
-	communicationStack->sendEvent(DeleteUserResponse(false));
+	communicationStack->sendEvent(DeleteUserResponse(true));
 }
 
 void Client::handleDeletePostRequest(DeletePostRequest request)
