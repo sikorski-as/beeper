@@ -94,7 +94,7 @@ static int add_post_callback(void* data, int nr_cols, char** field, char** colNa
 	int id = std::stoi(field[0]);
 	int userId = std::stoi(field[1]);
 	std::string content;
-	if(field[2] == nullptr)
+	if(field[2] != nullptr)
 		content = std::string(field[2]);
 
 	result->push_back(Post(id, userId, content));
