@@ -696,7 +696,7 @@ public:
   }
 
   explicit DeletePostRequest(Event e){
-	  if(!checkEventKeys(e, {"type", "id"})) {
+	  if(!checkEventKeys(e, {"type", "post_id"})) {
 		  throw EventNotValid("Improper DELETE_POST_REQUEST");
 	  }
 	  try{
@@ -710,7 +710,7 @@ public:
   operator Event(){
 	  Event e;
 	  e["type"] = "DELETE_POST_REQUEST";
-	  e["id"] = id;
+	  e["post_id"] = id;
 	  return e;
   }
 };
