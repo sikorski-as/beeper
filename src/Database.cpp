@@ -326,8 +326,8 @@ std::vector<Post> Database::getNNewestPosts(int n)
 {
 	char* errorMsg = nullptr;
 	std::vector<Post> result;
-	std::string query = "select * from (select * from posts order by posts.id desc limit " + std::to_string(n)
-						+ " ) order by posts.id asc;";
+	std::string query = "select * from (select * from posts order by id desc limit " + std::to_string(n)
+						+ " ) order by id asc;";
 
 	int retval = sqlite3_exec(database, query.c_str(), add_post_callback, &result, &errorMsg);
 
