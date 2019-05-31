@@ -108,7 +108,7 @@ void Database::openDB(std::string fileName)
 
 	if(failure)
 	{
-		throw DatabaseException("Error while opening database: " + sqlite3_errcode(database));
+		throw DatabaseException("SQLite error while opening database: " + std::to_string(sqlite3_errcode(database)));
 	}
 	else
 	{
