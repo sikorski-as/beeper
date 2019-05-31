@@ -703,7 +703,7 @@ public:
 		  id = e["post_id"].get<int>();
 	  }
 	  catch(...){
-		  throw EventNotValid("Improper DELETE_POST");
+		  throw EventNotValid("Improper DELETE_POST_REQUEST");
 	  }
   }
 
