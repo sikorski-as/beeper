@@ -700,10 +700,10 @@ public:
 		  throw EventNotValid("Improper DELETE_POST_REQUEST");
 	  }
 	  try{
-		  id = e["id"].get<int>();
+		  id = e["post_id"].get<int>();
 	  }
 	  catch(...){
-		  throw EventNotValid("Improper GET_N_NEW_POSTS_RESPONSE");
+		  throw EventNotValid("Improper DELETE_POST");
 	  }
   }
 
