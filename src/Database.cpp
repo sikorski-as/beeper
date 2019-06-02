@@ -7,67 +7,108 @@
 #include "../database-objects/User.h"
 #include "../database-objects/Post.h"
 
-User* Database::storedUser = nullptr;
-Post* Database::storedPost = nullptr;
-std::vector<Post>* Database::storedPostVector = new std::vector<Post>();
-std::vector<User>* Database::storedUserVector = new std::vector<User>();
-
 static int make_user_callback(void *data, int nr_cols, char **field, char **colName)
 {
-	int id = std::stoi(field[0]);
-	std::string username(field[1]);
-	std::string alias(field[2]);
-	std::string bio(field[3]);
-	std::string password(field[4]);
+	User* result = static_cast<User*>(data);
+	try
+	{
+		int id = std::stoi(field[0]);
+		std::string username(field[1]);
+		std::string alias;
+		if (field[2] != nullptr)
+			alias = std::string(field[2]);
+		std::string bio;
+		if (field[3] != nullptr)
+			bio = std::string(field[3]);
+		std::string password(field[4]);
 
-	Database::storedUser = new User(id, username, alias, bio, password);
+		result->setId(id);
+		result->setUsername(username);
+		result->setAlias(alias);
+		result->setBio(bio);
+		result->setPassword(password);
+	}
+	catch (...)
+	{
+		return 1;
+	}
 
 	return 0;
 }
 
 static int add_user_callback(void *data, int nr_cols, char **field, char **colName)
 {
-	int id = std::stoi(field[0]);
-	std::string username(field[1]);
-	std::string alias(field[2]);
-	std::string bio(field[3]);
-	std::string password(field[4]);
+	std::vector<User>* result = static_cast<std::vector<User>*>(data);
 
-	Database::storedUserVector->push_back(User(id, username, alias, bio, password));
+	try
+	{
+		int id = std::stoi(field[0]);
+		std::string username(field[1]);
+		std::string alias;
+		if(field[2] != nullptr)
+			alias = std::string(field[2]);
+		std::string bio;
+		if(field[3] != nullptr)
+			bio = std::string(field[3]);
+		std::string password(field[4]);
+
+		result->push_back(User(id, username, alias, bio, password));
+		std::cout << id << " " << username << std::endl;
+	}
+	catch (...)
+	{
+		return 1;
+	}
 
 	return 0;
 }
 
 static int make_post_callback(void* data, int nr_cols, char** field, char** colName)
 {
-	int id = std::stoi(field[0]);
-	int userId = std::stoi(field[1]);
-	std::string content(field[2]);
+	Post* result = static_cast<Post*>(data);
 
-	Database::storedPost = new Post(id, userId, content);
+	try
+	{
+		int id = std::stoi(field[0]);
+		int userId = std::stoi(field[1]);
+		std::string content;
+		if (field[2] != nullptr)
+			content = std::string(field[2]);
+
+		result->setId(id);
+		result->setUserId(userId);
+		result->setContent(content);
+	}
+	catch (...)
+	{
+		return 1;
+	}
 
 	return 0;
 }
 
 static int add_post_callback(void* data, int nr_cols, char** field, char** colName)
 {
+	std::vector<Post>* result = static_cast<std::vector<Post>*>(data);
+
 	int id = std::stoi(field[0]);
 	int userId = std::stoi(field[1]);
-	std::string content(field[2]);
+	std::string content;
+	if(field[2] != nullptr)
+		content = std::string(field[2]);
 
-	Database::storedPostVector->push_back(Post(id, userId, content));
+	result->push_back(Post(id, userId, content));
 
 	return 0;
 }
 
 void Database::openDB(std::string fileName)
 {
-	int failure = sqlite3_open(fileName.c_str(), &database);
+	int failure = sqlite3_open_v2(fileName.c_str(), &database, SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE, nullptr);
 
 	if(failure)
 	{
-		std::cout << "Error while opening database: " + sqlite3_errcode(database) << std::endl;
-		exit(EXIT_FAILURE);
+		throw DatabaseException("SQLite error while opening database: " + std::to_string(sqlite3_errcode(database)));
 	}
 	else
 	{
@@ -85,8 +126,9 @@ void Database::addUser(std::string userName, std::string alias, std::string bio,
 
 	if(failure)
 	{
-		std::cout << "Error while adding user: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding user: " + error);
 	}
 	else
 	{
@@ -103,8 +145,9 @@ void Database::deleteUser(int id)
 
 	if(failure)
 	{
-		std::cout << "Error while deleting user: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while deleting user: " + error);
 	}
 	else
 	{
@@ -121,8 +164,9 @@ void Database::changeUserAlias(int id, std::string alias)
 
 	if(failure)
 	{
-		std::cout << "Error while changing alias: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while changing alias: " + error);
 	}
 	else
 	{
@@ -139,12 +183,33 @@ void Database::changeUserBio(int id, std::string bio)
 
 	if(failure)
 	{
-		std::cout << "Error while changing bio: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while changing bio: " + error);
 	}
 	else
 	{
 		std::cout << "Bio changed successfully" << std::endl;
+	}
+}
+
+std::vector<User> Database::getAllUsers()
+{
+	char* errorMsg = nullptr;
+	std::vector<User> result;
+	std::string query = "select * from users;";
+
+	int retval = sqlite3_exec(database, query.c_str(), add_user_callback, &result, &errorMsg);
+
+	if(retval != SQLITE_OK)
+	{
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting all users: " + error);
+	}
+	else
+	{
+		return result;
 	}
 }
 
@@ -158,50 +223,83 @@ void Database::addPost(int userId, std::string content)
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding post: " + error);
 	}
 	else
 	{
 		std::cout << "Post added successfully" << std::endl;
+	}
+}
+
+void Database::likePost(int userId, int postId)
+{
+	char* errorMsg = nullptr;
+	std::string query = "insert into likes (user_id, post_id) values (" +
+						std::to_string(userId) + ",'" + std::to_string(postId) + "');";
+
+	int failure = sqlite3_exec(database, query.c_str(), nullptr, nullptr, &errorMsg);
+
+	if(failure)
+	{
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while adding like: " + error);
+	}
+	else
+	{
+		std::cout << "Post liked successfully" << std::endl;
 	}
 }
 
 User Database::getUserById(int id)
 {
 	char* errorMsg = nullptr;
+	User result;
 	std::string query = "select * from users where id = " + std::to_string(id) + ";";
 
-	int failure = sqlite3_exec(database, query.c_str(), make_user_callback, nullptr, &errorMsg);
+	int failure = sqlite3_exec(database, query.c_str(), make_user_callback, &result, &errorMsg);
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting user by id: " + error);
+	}
+	else if(result.isEmpty())
+	{
+		throw DatabaseException("User not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedUser;
+		std::cout << "User got successfully" << std::endl;
+		return result;
 	}
 }
 
 User Database::getUserByUsername(std::string username)
 {
 	char* errorMsg = nullptr;
+	User result;
 	std::string query = "select * from users where username = '" + username + "';";
 
-	int failure = sqlite3_exec(database, query.c_str(), make_user_callback, nullptr, &errorMsg);
+	int failure = sqlite3_exec(database, query.c_str(), make_user_callback, &result, &errorMsg);
 
 	if(failure)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting user by username: " + error);
+	}
+	else if(result.isEmpty())
+	{
+		throw DatabaseException("User not found");
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedUser;
+		std::cout << "Got user successfully" << std::endl;
+		return result;
 	}
 }
 
@@ -214,8 +312,9 @@ void Database::deletePost(int id)
 
 	if(failure)
 	{
-		std::cout << "Error while deleting post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while deleting post: " + error);
 	}
 	else
 	{
@@ -223,81 +322,122 @@ void Database::deletePost(int id)
 	}
 }
 
-Post Database::getPostById(int id)
+std::vector<Post> Database::getNNewestPosts(int n)
 {
 	char* errorMsg = nullptr;
-	std::string query = "select * from posts where id = " + std::to_string(id) + ";";
+	std::vector<Post> result;
+	std::string query = "select * from (select * from posts order by id desc limit " + std::to_string(n)
+						+ " ) order by id asc;";
 
-	int failure = sqlite3_exec(database, query.c_str(), make_post_callback, nullptr, &errorMsg);
+	int retval = sqlite3_exec(database, query.c_str(), add_post_callback, &result, &errorMsg);
 
-	if(failure)
+	if(retval != SQLITE_OK)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting n newest posts: " + error);
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedPost;
+		return result;
+	}
+}
+
+Post Database::getPostById(int id)
+{
+	char* errorMsg = nullptr;
+	Post result;
+	std::string query = "select * from posts where id = " + std::to_string(id) + ";";
+
+	int failure = sqlite3_exec(database, query.c_str(), make_post_callback, &result, &errorMsg);
+
+	if(failure)
+	{
+		std::string error(errorMsg);
+		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting post by id: " + error);
+	}
+	else if(result.isEmpty())
+	{
+		throw DatabaseException("Post not found");
+	}
+	else
+	{
+		std::cout << "Post got successfully" << std::endl;
+		return result;
 	}
 }
 
 std::vector<Post> Database::getPostsByUserId(int userId)
 {
 	char* errorMsg = nullptr;
+	std::vector<Post> result;
 	std::string query = "select * from posts where user_id = " + std::to_string(userId) + ";";
 
-	int failure = sqlite3_exec(database, query.c_str(), add_post_callback, nullptr, &errorMsg);
+	int retval = sqlite3_exec(database, query.c_str(), add_post_callback, &result, &errorMsg);
 
-	if(failure)
+	if(retval != SQLITE_OK)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting posts by user id: " + error);
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedPostVector;
+		return result;
 	}
 }
 
 std::vector<User> Database::getLikesForPost(int postId)
 {
 	char* errorMsg = nullptr;
+	std::vector<User> result;
 	std::string query = "select * from users inner join likes on likes.user_id = users.id "
 			" where likes.post_id = " + std::to_string(postId) + ";";
 
-	int failure = sqlite3_exec(database, query.c_str(), add_user_callback, nullptr, &errorMsg);
+	int retval = sqlite3_exec(database, query.c_str(), add_user_callback, &result, &errorMsg);
 
-	if(failure)
+	if(retval != SQLITE_OK)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting likes for post: " + error);
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedUserVector;
+		return result;
 	}
 }
 
 std::vector<Post> Database::getLikedPostsForUser(int userId)
 {
 	char* errorMsg = nullptr;
+	std::vector<Post> result;
 	std::string query = "select * from posts inner join likes on likes.post_id = posts.id "
 			"where likes.user_id = " + std::to_string(userId) + ";";
 
-	int failure = sqlite3_exec(database, query.c_str(), add_post_callback, nullptr, &errorMsg);
+	int retval = sqlite3_exec(database, query.c_str(), add_post_callback, &result, &errorMsg);
 
-	if(failure)
+	if(retval != SQLITE_OK)
 	{
-		std::cout << "Error while adding post: " + std::string(errorMsg) << std::endl;
+		std::string error(errorMsg);
 		sqlite3_free(errorMsg);
+		throw DatabaseException("Error while getting liked posts for user: " + error);
 	}
 	else
 	{
-		std::cout << "Post added successfully" << std::endl;
-		return *Database::storedPostVector;
+		return result;
 	}
 }
 
+bool Database::containsForbiddenChars(std::string text)
+{
+	if(text.find('\'') == std::string::npos && text.find(';') == std::string::npos && text.find('-') == std::string::npos)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

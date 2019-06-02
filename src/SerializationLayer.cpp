@@ -22,7 +22,7 @@ Event SerializationLayer::deserialize() {
 
 void SerializationLayer::serialize(Event e) {
     Buffer packet;
-    auto s = e.dump();
+    auto s = e.dump(-1, ' ', true);
     packet.append(s);
     lowerLayer->handlePacket(packet);
 }

@@ -13,7 +13,15 @@ void Server::start(Address address, int queueLength) {
         listener.start(address, queueLength);
         selector.setListener(listener);
 
-        database.openDB("beeper.db");
+        try
+        {
+            database.openDB("beeper.db");
+        }
+        catch (DatabaseException& e)
+        {
+            std::cout << e.what() << std::endl;
+            return;
+        }
 
         running = true;
         std::thread communicationThread(&Server::communicationThreadTask, this);

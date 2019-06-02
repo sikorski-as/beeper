@@ -11,8 +11,7 @@
 #include "../src/Database.h"
 
 class Client : public IONotifiable{
-    User user;
-  	Database* database;
+    User* user;
     CommunicationStack * communicationStack;
 
     std::thread clientThread;
@@ -26,6 +25,16 @@ public:
     void notifyWrite() override;
 
     void handleLoginRequest(LoginRequest);
+  	void handleLogoutRequest(LogoutRequest);
+  	void handleRegisterRequest(RegisterRequest);
+  	void handleAddPostRequest(AddPostRequest);
+  	void handleLikePostRequest(LikePostRequest);
+  	void handleGetNNewPostsRequest(GetNNewPostsRequest);
+  	void handleGetAllUsersRequest(GetAllUsersRequest);
+  	void handleViewUserRequest(ViewUserRequest);
+  	void handleGetUserPostsRequest(GetUserPostsRequest);
+  	void handleDeleteUserRequest(DeleteUserRequest);
+  	void handleDeletePostRequest(DeletePostRequest);
 };
 
 
